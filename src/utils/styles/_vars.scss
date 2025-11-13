@@ -1,0 +1,32 @@
+:root {
+    //colors
+    --lightBgColor: #ffffff;
+    --darkBgColor: #000027;
+
+    --lightTextColor: #ffffff;
+    --darkTextColor: #1B1B23;
+
+    --lightBorderColor: #C7C5D0;
+    --darkBorderColor: #414163;
+
+    //effects
+
+    --transition-default: .3s ease;
+}
+
+
+@mixin button() {
+    padding: 0;
+    margin: 0;
+    background-color: unset;
+    border: 1px solid var(--border-color);
+    font-family: inherit;
+    color: inherit;
+    border-radius: 4px;
+    padding: 8px 6px;
+    font-size: 12px;
+    line-height: 16px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
