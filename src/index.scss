@@ -21,6 +21,13 @@ body {
   background-color: var(--bg-color);
 }
 
+menu,
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

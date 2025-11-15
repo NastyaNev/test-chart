@@ -1,0 +1,49 @@
+.settings {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+
+    &__data_chart {
+        display: flex;
+        gap: 8px;
+
+        &__drd_vars {
+            width: 160px;
+        }
+    }
+
+    &__tools {
+        display: flex;
+        gap: 10px;
+
+        li {
+            &:first-child {
+                margin-right: 10px;
+            }
+        }
+
+        &__zoom {
+            display: flex;
+
+            button {
+                &:first-child {
+                    border-right: none;
+                    width: 26px;
+                    border-radius: 4px 0 0 4px;
+                }
+
+                &:last-child {
+                    border-radius: 0 4px 4px 0;
+                }
+            }
+        }
+
+        &__refresh {
+            margin-left: -10px;
+
+            button {
+                border: none;
+            }
+        }
+    }
+}

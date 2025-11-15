@@ -1,10 +1,12 @@
-import Dropdown from "../UI/dropdown/Dropdown";
+import Settings from "../settings/Settings";
 import styles from "./Content.module.scss";
+import Chart from "../chart/Chart";
 
 function Content() {
   return (
     <main className={styles.content}>
-      <Dropdown />
+      <Settings />
+      <Chart />
     </main>
   );
 }

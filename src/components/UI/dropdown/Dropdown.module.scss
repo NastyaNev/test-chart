@@ -2,4 +2,35 @@
 
 .dropdown {
     @include button();
+
+    width: fit-content;
+
+    justify-content: space-between;
+    gap: 8px;
+
+    &__input {
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: unset;
+        font-size: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        font-family: inherit;
+        color: inherit;
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+
+        svg {
+            width: 14px;
+            height: 14px;
+
+            path {
+                transition: var(--transition-default);
+            }
+        }
+    }
 }

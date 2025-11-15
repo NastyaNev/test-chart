@@ -23,10 +23,27 @@
     font-family: inherit;
     color: inherit;
     border-radius: 4px;
-    padding: 8px 6px;
+    padding: 8px;
     font-size: 12px;
     line-height: 16px;
+    cursor: pointer;
+    height: fit-content;
     display: flex;
-    justify-content: space-between;
-    gap: 8px;
+    align-items: center;
+    height: 27px;
+    width: 27px;
+
+    svg {
+        width: 11px;
+        height: 11px;
+
+        path {
+            fill: var(--border-color2);
+        }
+    }
+
+    &:hover,
+    &:active {
+        background-color: transparantize(var(--border-color2), 0.5);
+    }
 }
