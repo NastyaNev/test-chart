@@ -47,3 +47,11 @@
         }
     }
 }
+
+.dropdownMenuVariations,
+.dropdownMenuLineStyle {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 1000;
+}

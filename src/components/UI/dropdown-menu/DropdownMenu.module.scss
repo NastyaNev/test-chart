@@ -1,3 +1,45 @@
-.dropdown-menu {
-    
+@import "../../../utils/styles/vars";
+
+.dropdownMenu {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    width: fit-content;
+    min-width: 150px;
+
+    &__item {
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition: var(--transition-default);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    &__content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 5px;
+        flex-shrink: 0;
+    }
+
+    &__label {
+        font-size: 12px;
+        font-family: "Roboto", sans-serif;
+        color: var(--text-color);
+        line-height: 1.4;
+    }
 }

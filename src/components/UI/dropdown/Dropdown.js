@@ -1,13 +1,13 @@
 import styles from "./Dropdown.module.scss";
 import * as svg from "../Icons";
 
-function Dropdown({ className, type, id, value }) {
+function Dropdown({ className, type, id, value, onClick }) {
   return (
     <div className={[styles.dropdown, className].join(" ")}>
       <input
         className={styles.dropdown__input}
         value={value ?? "hello"}
-        onClick={() => {}}
+        onClick={onClick || (() => {})}
         readOnly
         type={type ?? "button"}
         id={id}
