@@ -22,6 +22,7 @@ function Chart() {
   const { theme } = useTheme();
   const [selectedVariationId, setSelectedVariationId] = useState("all");
   const [selectedStyle, setSelectedStyle] = useState("curve-line");
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
 
   useEffect(() => {
     const updateFromURL = () => {
@@ -36,6 +37,14 @@ function Chart() {
       if (styleId) {
         const style = LINE_STYLES.find(s => String(s.id) === styleId);
         if (style) setSelectedStyle(style.value);
+      }
+
+      const dateStart = params.get("filter[dateStart]");
+      const dateEnd = params.get("filter[dateEnd]");
+      if (dateStart && dateEnd) {
+        setSelectedDateRange({ start: dateStart, end: dateEnd });
+      } else {
+        setSelectedDateRange({ start: null, end: null });
       }
     };
 
@@ -60,14 +69,55 @@ function Chart() {
   }, []);
 
   const { labels, variations, dataMap } = useMemo(() => {
-    const labelsList = data.data.map((i) => i.date);
+    let filteredData = [...data.data];
 
-    const lastDate = new Date(labelsList[labelsList.length - 1]);
-    const nextMonthDate = new Date(lastDate);
-    nextMonthDate.setDate(1);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
-    const nextMonthLabel = nextMonthDate.toISOString().split("T")[0];
-    labelsList.push(nextMonthLabel);
+    // Filter by date range if selected
+    if (selectedDateRange.start && selectedDateRange.end) {
+      const startDate = new Date(selectedDateRange.start);
+      const endDate = new Date(selectedDateRange.end);
+
+      filteredData = filteredData.filter((item) => {
+        const itemDate = new Date(item.date);
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+    }
+
+    let labelsList = [];
+
+    // If single date selected, generate full month labels
+    if (selectedDateRange.start && selectedDateRange.end &&
+        selectedDateRange.start === selectedDateRange.end) {
+      const selectedDate = new Date(selectedDateRange.start);
+      const year = selectedDate.getFullYear();
+      const month = selectedDate.getMonth();
+
+      // Get first and last day of the month
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+
+      // Generate all dates in the month
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const dateStr = date.toISOString().split("T")[0];
+        labelsList.push(dateStr);
+      }
+
+      // Add first day of next month
+      const nextMonthDate = new Date(year, month + 1, 1);
+      labelsList.push(nextMonthDate.toISOString().split("T")[0]);
+    } else {
+      // Regular date range or no filter
+      labelsList = filteredData.map((i) => i.date);
+
+      if (labelsList.length > 0) {
+        const lastDate = new Date(labelsList[labelsList.length - 1]);
+        const nextMonthDate = new Date(lastDate);
+        nextMonthDate.setDate(1);
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+        const nextMonthLabel = nextMonthDate.toISOString().split("T")[0];
+        labelsList.push(nextMonthLabel);
+      }
+    }
 
     let variationsList = data.variations.map((i, index) => ({
       id: i.id ?? 0,
@@ -92,14 +142,23 @@ function Chart() {
     });
 
     return { labels: labelsList, variations: variationsList, dataMap: map };
-  }, [selectedVariationId]);
+  }, [selectedVariationId, selectedDateRange]);
 
   const datasets = useMemo(() => {
     const result = [];
 
+    // Check if single date is selected
+    const isSingleDate = selectedDateRange.start && selectedDateRange.end &&
+                         selectedDateRange.start === selectedDateRange.end;
+
     variations.forEach((variation) => {
       const colorIndex = variation.originalIndex;
       const chartData = labels.map((date) => {
+        // For single date mode, only show data for the selected date
+        if (isSingleDate && date !== selectedDateRange.start) {
+          return null;
+        }
+
         const dayData = dataMap.get(date);
 
         if (!dayData) return null;
@@ -111,7 +170,7 @@ function Chart() {
         return Number((varData.conversions / varData.visits) * 100).toFixed(2);
       });
 
-      if (selectedStyle === "highlight-line") {
+      if (selectedStyle === "highlight-line" && !isSingleDate) {
         result.push({
           label: variation.name + '_highlight',
           data: chartData,
@@ -134,15 +193,26 @@ function Chart() {
         spanGaps: true,
         borderColor: COLOR_PALETTE[colorIndex],
         borderWidth: 2,
-        pointStyle: false,
-        fill: selectedStyle === "area",
+        // Show points for single date, hide for date ranges
+        showLine: !isSingleDate,
+        pointStyle: isSingleDate ? 'circle' : false,
+        pointRadius: isSingleDate ? 6 : 0,
+        pointHoverRadius: isSingleDate ? 8 : 0,
+        // Point background: transparent 0.5 for single date, solid for ranges
+        pointBackgroundColor: isSingleDate
+          ? hexToRGBA(COLOR_PALETTE[colorIndex], 0.5)
+          : COLOR_PALETTE[colorIndex],
+        // Point border: always solid color
+        pointBorderColor: COLOR_PALETTE[colorIndex],
+        pointBorderWidth: isSingleDate ? 1 : 2,
+        fill: selectedStyle === "area" && !isSingleDate,
         backgroundColor: hexToRGBA(COLOR_PALETTE[colorIndex], 0.5),
         order: selectedStyle === "highlight-line" ? 1 : undefined,
       });
     });
 
     return result;
-  }, [labels, variations, dataMap, selectedStyle]);
+  }, [labels, variations, dataMap, selectedStyle, selectedDateRange]);
 
   ChartJS.register(
     CategoryScale,

@@ -8,6 +8,12 @@
     justify-content: space-between;
     gap: 8px;
 
+    &_disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
     &__input {
         margin: 0;
         padding: 0;
@@ -18,6 +24,10 @@
         font-size: inherit;
         font-family: inherit;
         color: inherit;
+
+        &:disabled {
+            cursor: not-allowed;
+        }
     }
 
     &__icon {

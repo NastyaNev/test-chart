@@ -1,0 +1,112 @@
+@import "../../../utils/styles/vars";
+
+.dateRangePicker {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    width: fit-content;
+    min-width: 280px;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 8px;
+    }
+
+    &__navBtn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px 8px;
+        font-size: 16px;
+        color: var(--text-color);
+        transition: var(--transition-default);
+
+        &:hover:not(:disabled) {
+            opacity: 0.7;
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+    }
+
+    &__monthYear {
+        font-size: 14px;
+        font-family: "Roboto", sans-serif;
+        font-weight: 500;
+        color: var(--text-color);
+        flex: 1;
+        text-align: center;
+    }
+
+    &__weekDays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        margin-bottom: 8px;
+    }
+
+    &__weekDay {
+        font-size: 11px;
+        font-family: "Roboto", sans-serif;
+        color: var(--text-color);
+        text-align: center;
+        padding: 4px;
+        opacity: 0.6;
+        font-weight: 500;
+    }
+
+    &__days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+
+    &__day {
+        font-size: 12px;
+        font-family: "Roboto", sans-serif;
+        color: var(--text-color);
+        text-align: center;
+        padding: 8px 4px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: var(--transition-default);
+        position: relative;
+
+        &:hover:not(&_disabled):not(&_empty) {
+            background-color: rgba(128, 128, 128, 0.1);
+        }
+
+        &_empty {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        &_disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        &_start,
+        &_end {
+            background-color: var(--accent-color, #4a90e2);
+            color: white;
+            font-weight: 500;
+
+            &:hover {
+                background-color: var(--accent-color, #4a90e2);
+                opacity: 0.9;
+            }
+        }
+
+        &_inRange:not(&_start):not(&_end) {
+            background-color: rgba(74, 144, 226, 0.2);
+        }
+    }
+}

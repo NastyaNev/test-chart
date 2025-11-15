@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import Button from "../UI/button/Button";
 import Dropdown from "../UI/dropdown/Dropdown";
 import DropdownMenu from "../UI/dropdown-menu/DropdownMenu";
+import DateRangePicker from "../UI/date-range-picker/DateRangePicker";
 import styles from "./Settings.module.scss";
 import * as svg from "../UI/Icons";
 import { LINE_STYLES, COLOR_PALETTE } from "../../utils/constants/chartConstants";
@@ -20,10 +21,27 @@ function Settings() {
     return [allOption, ...processedVariations];
   }, []);
 
+  // Extract available dates from data
+  const availableDates = useMemo(() => {
+    return data.data.map(item => item.date);
+  }, []);
+
+  // Initialize with first and last date
+  const [dateRange, setDateRange] = useState(() => {
+    if (availableDates.length > 0) {
+      return {
+        start: availableDates[0],
+        end: availableDates[availableDates.length - 1]
+      };
+    }
+    return { start: null, end: null };
+  });
+
   const [selectedVariation, setSelectedVariation] = useState(variations[0]);
   const [selectedLineStyle, setSelectedLineStyle] = useState(LINE_STYLES[0]);
   const [showVariationsMenu, setShowVariationsMenu] = useState(false);
   const [showLineStyleMenu, setShowLineStyleMenu] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -47,12 +65,22 @@ function Settings() {
       needsUpdate = true;
     }
 
+    const dateStart = params.get("filter[dateStart]");
+    const dateEnd = params.get("filter[dateEnd]");
+    if (dateStart && dateEnd) {
+      setDateRange({ start: dateStart, end: dateEnd });
+    } else if (dateRange.start && dateRange.end) {
+      params.set("filter[dateStart]", dateRange.start);
+      params.set("filter[dateEnd]", dateRange.end);
+      needsUpdate = true;
+    }
+
     if (needsUpdate) {
       const url = new URL(window.location);
       url.search = params.toString();
       window.history.replaceState({}, "", url);
     }
-  }, [variations]);
+  }, [variations, dateRange]);
 
   const updateURLParam = (key, value) => {
     const url = new URL(window.location);
@@ -71,6 +99,31 @@ function Settings() {
     setShowLineStyleMenu(false);
     updateURLParam("filter[style]", style.id);
   };
+
+  const handleDateRangeSelect = (start, end) => {
+    setDateRange({ start, end });
+    setShowDatePicker(false);
+    updateURLParam("filter[dateStart]", start);
+    updateURLParam("filter[dateEnd]", end);
+  };
+
+  // Format date from YYYY-MM-DD to DD/MM/YYYY
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  // Format date range display
+  const dateRangeDisplay = useMemo(() => {
+    if (!dateRange.start || !dateRange.end) return "Select date range";
+    return `${formatDate(dateRange.start)}-${formatDate(dateRange.end)}`;
+  }, [dateRange]);
+
+  // Check if single date is selected
+  const isSingleDate = useMemo(() => {
+    return dateRange.start && dateRange.end && dateRange.start === dateRange.end;
+  }, [dateRange]);
 
   const variationMenuItems = variations.map((variation, index) => ({
     label: variation.name,
@@ -102,8 +155,20 @@ function Settings() {
             />
           )}
         </li>
-        <li>
-          <Dropdown type="date" id="dropdown-date" />
+        <li style={{ position: "relative" }}>
+          <Dropdown
+            type="button"
+            id="dropdown-date"
+            value={dateRangeDisplay}
+            onClick={() => setShowDatePicker(!showDatePicker)}
+          />
+          {showDatePicker && (
+            <DateRangePicker
+              availableDates={availableDates}
+              onRangeSelect={handleDateRangeSelect}
+              className={styles.dropdownMenuDate}
+            />
+          )}
         </li>
       </menu>
       <menu className={styles.settings__tools}>
@@ -112,8 +177,9 @@ function Settings() {
             id="dropdown-line"
             value={`Style: ${selectedLineStyle.name.toLowerCase()}`}
             onClick={() => setShowLineStyleMenu(!showLineStyleMenu)}
+            disabled={isSingleDate}
           />
-          {showLineStyleMenu && (
+          {showLineStyleMenu && !isSingleDate && (
             <DropdownMenu
               items={lineStyleMenuItems}
               showDots={false}
