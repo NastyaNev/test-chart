@@ -272,7 +272,7 @@ function Chart() {
             tooltipEl = document.createElement("div");
             tooltipEl.id = "chartjs-tooltip";
             tooltipEl.style.position = "absolute";
-            tooltipEl.style.pointerEvents = "auto";
+            tooltipEl.style.pointerEvents = "none";
             tooltipEl.style.transition = "all .1s ease";
             tooltipEl.isHovered = false;
 
@@ -314,10 +314,26 @@ function Chart() {
           }
 
           const tooltipModel = context.tooltip;
-          if (tooltipModel.opacity === 0 && !tooltipEl.isHovered) {
+
+          // Check if cursor is over date picker or dropdown menu
+          const datePickerOpen = document.querySelector('[class*="dateRangePicker"]');
+          const dropdownMenuOpen = document.querySelector('[class*="dropdownMenu"]');
+
+          // Hide tooltip if date picker or dropdown menu is open
+          if (datePickerOpen || dropdownMenuOpen) {
             tooltipEl.style.opacity = 0;
+            tooltipEl.style.pointerEvents = "none";
             return;
           }
+
+          if (tooltipModel.opacity === 0 && !tooltipEl.isHovered) {
+            tooltipEl.style.opacity = 0;
+            tooltipEl.style.pointerEvents = "none";
+            return;
+          }
+
+          // Enable pointer events when tooltip is visible
+          tooltipEl.style.pointerEvents = "auto";
 
           tooltipEl.classList.remove("above", "below", "no-transform");
           if (tooltipModel.yAlign) {

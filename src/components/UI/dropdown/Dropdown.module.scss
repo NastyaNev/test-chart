@@ -7,6 +7,13 @@
 
     justify-content: space-between;
     gap: 8px;
+    cursor: pointer;
+
+    &:hover:not(.dropdown_disabled) {
+        .dropdown__icon:not(.dropdown__icon_open) svg {
+            transform: translateY(1px);
+        }
+    }
 
     &_disabled {
         opacity: 0.5;
@@ -24,6 +31,8 @@
         font-size: inherit;
         font-family: inherit;
         color: inherit;
+        cursor: pointer;
+        pointer-events: none;
 
         &:disabled {
             cursor: not-allowed;
@@ -33,13 +42,21 @@
     &__icon {
         display: flex;
         align-items: center;
+        pointer-events: none;
 
         svg {
             width: 14px;
             height: 14px;
+            transition: transform var(--transition-default);
 
             path {
                 transition: var(--transition-default);
+            }
+        }
+
+        &_open {
+            svg {
+                transform: rotate(180deg);
             }
         }
     }

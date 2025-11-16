@@ -9,6 +9,14 @@
     --lightBorderColor: #C7C5D0;
     --darkBorderColor: #414163;
 
+    //hover states
+    --hover-bg-color: rgba(65, 65, 99, 0.08);
+    --hover-border-color: #9D9BB0;
+    --hover-icon-color: #1B1B23;
+
+    --active-bg-color: rgba(65, 65, 99, 0.15);
+    --active-border-color: #7A7890;
+
     //effects
 
     --transition-default: .3s ease;
@@ -32,6 +40,7 @@
     align-items: center;
     height: 27px;
     width: 27px;
+    transition: all var(--transition-default);
 
     svg {
         width: 11px;
@@ -39,11 +48,26 @@
 
         path {
             fill: var(--border-color2);
+            transition: var(--transition-default);
         }
     }
 
-    &:hover,
-    &:active {
-        background-color: transparantize(var(--border-color2), 0.5);
+    &:hover:not(:disabled) {
+        background-color: var(--hover-bg-color);
+        border-color: var(--hover-border-color);
+
+        svg path {
+            fill: var(--hover-icon-color);
+        }
+    }
+
+    &:active:not(:disabled) {
+        background-color: var(--active-bg-color);
+        border-color: var(--active-border-color);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }

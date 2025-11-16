@@ -18,15 +18,17 @@
 
     &__navBtn {
         background: none;
-        border: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
         cursor: pointer;
         padding: 4px 8px;
         font-size: 16px;
         color: var(--text-color);
-        transition: var(--transition-default);
+        transition: all var(--transition-default);
 
         &:hover:not(:disabled) {
-            opacity: 0.7;
+            background-color: var(--hover-bg-color);
+            border-color: var(--hover-border-color);
         }
 
         &:disabled {
@@ -75,11 +77,11 @@
         padding: 8px 4px;
         border-radius: 6px;
         cursor: pointer;
-        transition: var(--transition-default);
+        transition: all var(--transition-default);
         position: relative;
 
         &:hover:not(&_disabled):not(&_empty) {
-            background-color: rgba(128, 128, 128, 0.1);
+            background-color: var(--hover-bg-color);
         }
 
         &_empty {
@@ -95,18 +97,22 @@
 
         &_start,
         &_end {
-            background-color: var(--accent-color, #4a90e2);
+            background-color: rgba(65, 65, 99, 0.85);
             color: white;
-            font-weight: 500;
+            font-weight: 600;
 
             &:hover {
-                background-color: var(--accent-color, #4a90e2);
-                opacity: 0.9;
+                background-color: rgba(65, 65, 99, 0.95);
             }
         }
 
         &_inRange:not(&_start):not(&_end) {
-            background-color: rgba(74, 144, 226, 0.2);
+            background-color: rgba(65, 65, 99, 0.15);
+            font-weight: 500;
+
+            &:hover {
+                background-color: rgba(65, 65, 99, 0.22);
+            }
         }
     }
 }

@@ -11,14 +11,26 @@
     &__item {
         margin-bottom: 6px;
         cursor: pointer;
-        transition: var(--transition-default);
+        transition: all var(--transition-default);
+        padding: 6px 8px;
+        border-radius: 6px;
+        background-color: transparent;
 
         &:last-child {
             margin-bottom: 0;
         }
 
         &:hover {
-            opacity: 0.7;
+            background-color: var(--hover-bg-color);
+        }
+
+        &_selected {
+            background-color: rgba(65, 65, 99, 0.12);
+            font-weight: 500;
+
+            &:hover {
+                background-color: rgba(65, 65, 99, 0.18);
+            }
         }
     }
 

@@ -28,6 +28,7 @@
 
         &__zoom {
             display: flex;
+            margin-left: -10px;
 
             button {
                 &:first-child {
@@ -43,11 +44,11 @@
         }
 
         &__no_frame_btn {
-            &:last-child {
-                button {
-                    padding-left: 0;
-                }
-            }
+            // &:last-child {
+            //     button {
+            //         padding-left: 0;
+            //     }
+            // }
 
             button {
                 border: none;

@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import styles from "./DateRangePicker.module.scss";
 
-function DateRangePicker({ availableDates = [], onRangeSelect, className }) {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+function DateRangePicker({ availableDates = [], onRangeSelect, className, selectedStartDate = null, selectedEndDate = null }) {
+  const [startDate, setStartDate] = useState(selectedStartDate);
+  const [endDate, setEndDate] = useState(selectedEndDate);
   const [hoveredDate, setHoveredDate] = useState(null);
 
   // Parse available dates and get available months
@@ -158,18 +158,26 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className }) {
 
   const getMonthName = (monthIndex) => {
     const months = [
-      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return months[monthIndex];
   };
 
   if (!availableMonthsInfo) return null;
 
-  const weekDays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Prevent click events from bubbling up to document
+  const handleContainerClick = (e) => {
+    e.stopPropagation();
+  };
 
   return (
-    <div className={[styles.dateRangePicker, className].filter(Boolean).join(" ")}>
+    <div
+      className={[styles.dateRangePicker, className].filter(Boolean).join(" ")}
+      onClick={handleContainerClick}
+    >
       <div className={styles.dateRangePicker__header}>
         <button
           className={styles.dateRangePicker__navBtn}

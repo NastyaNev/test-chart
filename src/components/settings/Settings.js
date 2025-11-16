@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Button from "../UI/button/Button";
 import Dropdown from "../UI/dropdown/Dropdown";
 import DropdownMenu from "../UI/dropdown-menu/DropdownMenu";
@@ -47,6 +47,12 @@ function Settings() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
 
+  // Refs for click outside detection
+  const variationsRef = useRef(null);
+  const datePickerRef = useRef(null);
+  const lineStyleRef = useRef(null);
+
+  // Initialize state from URL params only once on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     let needsUpdate = false;
@@ -73,9 +79,9 @@ function Settings() {
     const dateEnd = params.get("filter[dateEnd]");
     if (dateStart && dateEnd) {
       setDateRange({ start: dateStart, end: dateEnd });
-    } else if (dateRange.start && dateRange.end) {
-      params.set("filter[dateStart]", dateRange.start);
-      params.set("filter[dateEnd]", dateRange.end);
+    } else if (availableDates.length > 0) {
+      params.set("filter[dateStart]", availableDates[0]);
+      params.set("filter[dateEnd]", availableDates[availableDates.length - 1]);
       needsUpdate = true;
     }
 
@@ -95,7 +101,48 @@ function Settings() {
       url.search = params.toString();
       window.history.replaceState({}, "", url);
     }
-  }, [variations, dateRange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Handle click outside dropdowns to close them
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check variations menu
+      if (
+        showVariationsMenu &&
+        variationsRef.current &&
+        !variationsRef.current.contains(event.target)
+      ) {
+        setShowVariationsMenu(false);
+      }
+
+      // Check date picker
+      if (
+        showDatePicker &&
+        datePickerRef.current &&
+        !datePickerRef.current.contains(event.target)
+      ) {
+        setShowDatePicker(false);
+      }
+
+      // Check line style menu
+      if (
+        showLineStyleMenu &&
+        lineStyleRef.current &&
+        !lineStyleRef.current.contains(event.target)
+      ) {
+        setShowLineStyleMenu(false);
+      }
+    };
+
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showVariationsMenu, showDatePicker, showLineStyleMenu]);
 
   const updateURLParam = (key, value) => {
     const url = new URL(window.location);
@@ -230,67 +277,74 @@ function Settings() {
   return (
     <div className={styles.settings}>
       <menu className={styles.settings__data_chart}>
-        <li style={{ position: "relative" }}>
+        <li ref={variationsRef} style={{ position: "relative" }}>
           <Dropdown
             type="button"
             id="dropdown-variations"
             className={styles.settings__data_chart__drd_vars}
             value={selectedVariation.name}
             onClick={() => setShowVariationsMenu(!showVariationsMenu)}
+            isOpen={showVariationsMenu}
           />
           {showVariationsMenu && (
             <DropdownMenu
               items={variationMenuItems}
               showDots={true}
               className={styles.dropdownMenuVariations}
+              selectedLabel={selectedVariation.name}
             />
           )}
         </li>
-        <li style={{ position: "relative" }}>
+        <li ref={datePickerRef} style={{ position: "relative" }}>
           <Dropdown
             type="button"
             id="dropdown-date"
             value={dateRangeDisplay}
             onClick={() => setShowDatePicker(!showDatePicker)}
+            isOpen={showDatePicker}
           />
           {showDatePicker && (
             <DateRangePicker
               availableDates={availableDates}
               onRangeSelect={handleDateRangeSelect}
               className={styles.dropdownMenuDate}
+              selectedStartDate={dateRange.start}
+              selectedEndDate={dateRange.end}
             />
           )}
         </li>
       </menu>
       <menu className={styles.settings__tools}>
-        <li style={{ position: "relative" }}>
+        <li ref={lineStyleRef} style={{ position: "relative" }}>
           <Dropdown
             id="dropdown-line"
             value={`Style: ${selectedLineStyle.name.toLowerCase()}`}
             onClick={() => setShowLineStyleMenu(!showLineStyleMenu)}
             disabled={isSingleDate}
+            isOpen={showLineStyleMenu}
           />
           {showLineStyleMenu && !isSingleDate && (
             <DropdownMenu
               items={lineStyleMenuItems}
               showDots={false}
               className={styles.dropdownMenuLineStyle}
+              selectedLabel={selectedLineStyle.name}
             />
           )}
         </li>
         <div className={styles.settings__tools__buttons}>
           <li>
-            <Button icon={<svg.Select />} onClick={handleZoomReset} />
+            <Button icon={<svg.Select />} onClick={handleZoomReset} title="Reset Zoom" disabled={zoomLevel === 1} />
           </li>
           <li className={styles.settings__tools__zoom}>
-            <Button icon={<svg.Minus />} onClick={handleZoomOut} />
-            <Button icon={<svg.Plus />} onClick={handleZoomIn} />
+            <Button icon={<svg.Minus />} onClick={handleZoomOut} title="Zoom In" />
+            <Button icon={<svg.Plus />} onClick={handleZoomIn} title="Zoom Out" />
           </li>
           <li className={styles.settings__tools__no_frame_btn}>
-            <Button icon={<svg.Refresh />} onClick={handleRefresh} />
+            <Button icon={<svg.Refresh />} onClick={handleRefresh} title="Refresh" />
           </li>
           <li className={styles.settings__tools__no_frame_btn}>
-            <Button icon={<svg.Download />} onClick={handleDownload} />
+            <Button icon={<svg.Download />} onClick={handleDownload} title="Download PNG" />
           </li>
         </div>
       </menu>

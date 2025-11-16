@@ -1,20 +1,23 @@
 import styles from "./Dropdown.module.scss";
 import * as svg from "../Icons";
 
-function Dropdown({ className, type, id, value, onClick, disabled = false }) {
+function Dropdown({ className, type, id, value, onClick, disabled = false, isOpen = false }) {
   return (
-    <div className={[styles.dropdown, className, disabled && styles.dropdown_disabled].filter(Boolean).join(" ")}>
+    <div
+      className={[styles.dropdown, className, disabled && styles.dropdown_disabled].filter(Boolean).join(" ")}
+      onClick={disabled ? undefined : (onClick || (() => {}))}
+    >
       <input
         className={styles.dropdown__input}
         value={value ?? "hello"}
-        onClick={disabled ? undefined : (onClick || (() => {}))}
         readOnly
         type={type ?? "button"}
         id={id}
         name={id}
         disabled={disabled}
+        tabIndex={-1}
       />
-      <span className={styles.dropdown__icon}>
+      <span className={[styles.dropdown__icon, isOpen && styles.dropdown__icon_open].filter(Boolean).join(" ")}>
         <svg.Chevron />
       </span>
     </div>
