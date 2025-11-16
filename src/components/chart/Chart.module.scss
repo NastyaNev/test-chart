@@ -1,3 +1,27 @@
 .chart {
     height: 300px;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    // Scrollbar styles (same as tooltip)
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.5);
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(128, 128, 128, 0.7);
+    }
+
+    // Firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
 }

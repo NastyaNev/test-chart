@@ -23,6 +23,7 @@ function Chart() {
   const [selectedVariationId, setSelectedVariationId] = useState("all");
   const [selectedStyle, setSelectedStyle] = useState("curve-line");
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
     const updateFromURL = () => {
@@ -45,6 +46,11 @@ function Chart() {
         setSelectedDateRange({ start: dateStart, end: dateEnd });
       } else {
         setSelectedDateRange({ start: null, end: null });
+      }
+
+      const zoom = params.get("zoom");
+      if (zoom) {
+        setZoomLevel(parseFloat(zoom));
       }
     };
 
@@ -559,7 +565,9 @@ function Chart() {
 
   return (
     <div className={styles.chart}>
-      <Line options={chartOptions} data={chartData} />
+      <div style={{ width: `${zoomLevel * 100}%`, minWidth: '100%', height: '100%' }}>
+        <Line options={chartOptions} data={chartData} />
+      </div>
     </div>
   );
 }

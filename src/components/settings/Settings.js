@@ -42,6 +42,7 @@ function Settings() {
   const [showVariationsMenu, setShowVariationsMenu] = useState(false);
   const [showLineStyleMenu, setShowLineStyleMenu] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -105,6 +106,18 @@ function Settings() {
     setShowDatePicker(false);
     updateURLParam("filter[dateStart]", start);
     updateURLParam("filter[dateEnd]", end);
+  };
+
+  const handleZoomIn = () => {
+    const newZoom = Math.min(zoomLevel + 0.2, 3); // Max zoom 3x
+    setZoomLevel(newZoom);
+    updateURLParam("zoom", newZoom.toFixed(1));
+  };
+
+  const handleZoomOut = () => {
+    const newZoom = Math.max(zoomLevel - 0.2, 0.5); // Min zoom 0.5x
+    setZoomLevel(newZoom);
+    updateURLParam("zoom", newZoom.toFixed(1));
   };
 
   // Format date from YYYY-MM-DD to DD/MM/YYYY
@@ -191,8 +204,8 @@ function Settings() {
           <Button icon={<svg.Select />} />
         </li>
         <li className={styles.settings__tools__zoom}>
-          <Button icon={<svg.Minus />} />
-          <Button icon={<svg.Plus />} />
+          <Button icon={<svg.Minus />} onClick={handleZoomOut} />
+          <Button icon={<svg.Plus />} onClick={handleZoomIn} />
         </li>
         <li className={styles.settings__tools__refresh}>
           <Button icon={<svg.Refresh />} />
