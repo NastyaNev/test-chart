@@ -16,6 +16,10 @@
         display: flex;
         gap: 10px;
 
+        &__buttons {
+            display: contents;
+        }
+
         li {
             &:first-child {
                 margin-right: 10px;
@@ -38,8 +42,12 @@
             }
         }
 
-        &__refresh {
-            margin-left: -10px;
+        &__no_frame_btn {
+            &:last-child {
+                button {
+                    padding-left: 0;
+                }
+            }
 
             button {
                 border: none;
@@ -55,4 +63,22 @@
     top: calc(100% + 4px);
     left: 0;
     z-index: 1000;
+}
+
+@media screen and (max-width: 671px) {
+    .settings {
+        flex-direction: column;
+
+        &__data_chart {
+            flex-direction: column;
+        }
+
+        &__tools {
+            flex-direction: column;
+
+            &__buttons {
+                display: flex;
+            }
+        }
+    }
 }
