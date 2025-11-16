@@ -18,20 +18,19 @@ import { data } from "./data";
 import { hexToRGBA } from "../../utils/functions/functions";
 import { COLOR_PALETTE, LINE_STYLES } from "../../utils/constants/chartConstants";
 
-function Chart() {
+function Chart({ zoomLevel }) {
   const { theme } = useTheme();
-  const [selectedVariationId, setSelectedVariationId] = useState("all");
+  const [selectedVariationIds, setSelectedVariationIds] = useState(["all"]);
   const [selectedStyle, setSelectedStyle] = useState("curve-line");
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
     const updateFromURL = () => {
       const params = new URLSearchParams(window.location.search);
 
-      const variationId = params.get("filter[variation]");
-      if (variationId) {
-        setSelectedVariationId(variationId);
+      const variationIds = params.get("filter[variation]");
+      if (variationIds) {
+        setSelectedVariationIds(variationIds.split(','));
       }
 
       const styleId = params.get("filter[style]");
@@ -48,10 +47,7 @@ function Chart() {
         setSelectedDateRange({ start: null, end: null });
       }
 
-      const zoom = params.get("zoom");
-      if (zoom) {
-        setZoomLevel(parseFloat(zoom));
-      }
+      // Zoom is not stored in URL anymore - will always reset to 1 on page refresh
     };
 
     updateFromURL();
@@ -75,6 +71,14 @@ function Chart() {
   }, []);
 
   const { labels, variations, dataMap } = useMemo(() => {
+    // Helper function to format date without UTC conversion
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     let filteredData = [...data.data];
 
     // Filter by date range if selected
@@ -104,13 +108,13 @@ function Chart() {
       // Generate all dates in the month
       for (let day = 1; day <= lastDay.getDate(); day++) {
         const date = new Date(year, month, day);
-        const dateStr = date.toISOString().split("T")[0];
+        const dateStr = formatDate(date);
         labelsList.push(dateStr);
       }
 
       // Add first day of next month
       const nextMonthDate = new Date(year, month + 1, 1);
-      labelsList.push(nextMonthDate.toISOString().split("T")[0]);
+      labelsList.push(formatDate(nextMonthDate));
     } else {
       // Regular date range or no filter
       labelsList = filteredData.map((i) => i.date);
@@ -131,8 +135,10 @@ function Chart() {
       originalIndex: index,
     }));
 
-    if (selectedVariationId !== "all") {
-      variationsList = variationsList.filter(v => String(v.id) === String(selectedVariationId));
+    if (!selectedVariationIds.includes("all")) {
+      variationsList = variationsList.filter(v =>
+        selectedVariationIds.includes(String(v.id))
+      );
     }
 
     const map = new Map();
@@ -148,7 +154,7 @@ function Chart() {
     });
 
     return { labels: labelsList, variations: variationsList, dataMap: map };
-  }, [selectedVariationId, selectedDateRange]);
+  }, [selectedVariationIds, selectedDateRange]);
 
   const datasets = useMemo(() => {
     const result = [];
@@ -227,6 +233,45 @@ function Chart() {
     return result;
   }, [labels, variations, dataMap, selectedStyle, selectedDateRange]);
 
+  const crosshairPlugin = (() => {
+    let lastX = null;
+
+    return {
+      id: 'crosshair',
+      afterDatasetsDraw: (chart, args, options) => {
+        // Update lastX if there's an active point
+        if (chart.tooltip?._active?.length) {
+          const activePoint = chart.tooltip._active[0];
+          lastX = activePoint.element.x;
+        }
+
+        // Draw the line if tooltip is visible (even when cursor is over tooltip)
+        const tooltipEl = document.getElementById("chartjs-tooltip");
+        const isTooltipVisible = tooltipEl && parseFloat(tooltipEl.style.opacity) > 0;
+
+        if ((chart.tooltip?._active?.length || isTooltipVisible) && lastX !== null) {
+          const ctx = chart.ctx;
+          const topY = chart.scales.y.top;
+          const bottomY = chart.scales.y.bottom;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(lastX, topY);
+          ctx.lineTo(lastX, bottomY);
+          ctx.lineWidth = options.line.width;
+          ctx.strokeStyle = options.line.color;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Reset lastX when tooltip is completely hidden
+        if (!isTooltipVisible && !chart.tooltip?._active?.length) {
+          lastX = null;
+        }
+      }
+    };
+  })();
+
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -236,7 +281,8 @@ function Chart() {
     Legend,
     PointElement,
     LineElement,
-    Filler
+    Filler,
+    crosshairPlugin
   );
 
   const chartOptions = useMemo(() => ({
@@ -246,6 +292,14 @@ function Chart() {
       intersect: false,
     },
     plugins: {
+      crosshair: {
+        line: {
+          color: theme === "light"
+            ? "rgba(199, 197, 208, 0.7)"
+            : "rgba(65, 65, 99, 0.7)",
+          width: 1
+        }
+      },
       legend: {
         display: false,
       },

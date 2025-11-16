@@ -11,7 +11,7 @@ import {
 } from "../../utils/constants/chartConstants";
 import { data } from "../chart/data";
 
-function Settings() {
+function Settings({ zoomLevel, setZoomLevel }) {
   const variations = useMemo(() => {
     const allOption = {
       id: "all",
@@ -40,12 +40,11 @@ function Settings() {
     return { start: null, end: null };
   });
 
-  const [selectedVariation, setSelectedVariation] = useState(variations[0]);
+  const [selectedVariations, setSelectedVariations] = useState([variations[0]]);
   const [selectedLineStyle, setSelectedLineStyle] = useState(LINE_STYLES[0]);
   const [showVariationsMenu, setShowVariationsMenu] = useState(false);
   const [showLineStyleMenu, setShowLineStyleMenu] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
 
   // Refs for click outside detection
   const variationsRef = useRef(null);
@@ -57,10 +56,17 @@ function Settings() {
     const params = new URLSearchParams(window.location.search);
     let needsUpdate = false;
 
-    const variationId = params.get("filter[variation]");
-    if (variationId) {
-      const variation = variations.find((v) => String(v.id) === variationId);
-      if (variation) setSelectedVariation(variation);
+    const variationIds = params.get("filter[variation]");
+    if (variationIds) {
+      const ids = variationIds.split(',');
+      const selectedVars = variations.filter((v) => ids.includes(String(v.id)));
+      if (selectedVars.length > 0) {
+        setSelectedVariations(selectedVars);
+      } else {
+        setSelectedVariations([variations[0]]);
+        params.set("filter[variation]", variations[0].id);
+        needsUpdate = true;
+      }
     } else {
       params.set("filter[variation]", variations[0].id);
       needsUpdate = true;
@@ -85,16 +91,7 @@ function Settings() {
       needsUpdate = true;
     }
 
-    const zoom = params.get("zoom");
-    if (zoom) {
-      const zoomValue = parseFloat(zoom);
-      if (!isNaN(zoomValue)) {
-        setZoomLevel(zoomValue);
-      }
-    } else {
-      params.set("zoom", "1.0");
-      needsUpdate = true;
-    }
+    // Zoom is not stored in URL anymore - will reset on page refresh
 
     if (needsUpdate) {
       const url = new URL(window.location);
@@ -151,9 +148,36 @@ function Settings() {
   };
 
   const handleVariationSelect = (variation) => {
-    setSelectedVariation(variation);
-    setShowVariationsMenu(false);
-    updateURLParam("filter[variation]", variation.id);
+    let newSelectedVariations;
+
+    if (variation.id === "all") {
+      // If "All variations" is selected, select only it
+      newSelectedVariations = [variation];
+      setShowVariationsMenu(false);
+    } else {
+      // Check if this variation is already selected
+      const isAlreadySelected = selectedVariations.some(v => v.id === variation.id);
+
+      if (isAlreadySelected) {
+        // Deselect this variation
+        newSelectedVariations = selectedVariations.filter(v => v.id !== variation.id);
+
+        // If nothing is selected, default to "All variations"
+        if (newSelectedVariations.length === 0) {
+          newSelectedVariations = [variations[0]]; // "All variations"
+          setShowVariationsMenu(false);
+        }
+      } else {
+        // Add this variation to selection
+        // Remove "All variations" if it's currently selected
+        const withoutAll = selectedVariations.filter(v => v.id !== "all");
+        newSelectedVariations = [...withoutAll, variation];
+      }
+    }
+
+    setSelectedVariations(newSelectedVariations);
+    const variationIds = newSelectedVariations.map(v => v.id).join(',');
+    updateURLParam("filter[variation]", variationIds);
   };
 
   const handleLineStyleSelect = (style) => {
@@ -172,23 +196,20 @@ function Settings() {
   const handleZoomIn = () => {
     const newZoom = Math.min(zoomLevel + 0.2, 3); // Max zoom 3x
     setZoomLevel(newZoom);
-    updateURLParam("zoom", newZoom.toFixed(1));
   };
 
   const handleZoomOut = () => {
     const newZoom = Math.max(zoomLevel - 0.2, 0.5); // Min zoom 0.5x
     setZoomLevel(newZoom);
-    updateURLParam("zoom", newZoom.toFixed(1));
   };
 
   const handleZoomReset = () => {
     setZoomLevel(1); // Reset to default zoom
-    updateURLParam("zoom", "1.0");
   };
 
   const handleRefresh = () => {
     // Reset all filters to default values
-    setSelectedVariation(variations[0]); // "All variations selected"
+    setSelectedVariations([variations[0]]); // "All variations selected"
     setSelectedLineStyle(LINE_STYLES[0]); // First line style
     setZoomLevel(1); // Default zoom
 
@@ -209,7 +230,6 @@ function Settings() {
       "filter[dateEnd]",
       availableDates[availableDates.length - 1]
     );
-    url.searchParams.set("zoom", "1.0");
     window.history.pushState({}, "", url);
   };
 
@@ -263,10 +283,23 @@ function Settings() {
     );
   }, [dateRange]);
 
+  // Get display value for variations dropdown
+  const variationsDisplayValue = useMemo(() => {
+    if (selectedVariations.length === 1 && selectedVariations[0].id === "all") {
+      return selectedVariations[0].name;
+    }
+    if (selectedVariations.length === 1) {
+      return selectedVariations[0].name;
+    }
+    return `${selectedVariations.length} variations selected`;
+  }, [selectedVariations]);
+
   const variationMenuItems = variations.map((variation, index) => ({
     label: variation.name,
     color: variation.id === "all" ? null : COLOR_PALETTE[index - 1],
     onClick: () => handleVariationSelect(variation),
+    isSelected: selectedVariations.some(v => v.id === variation.id),
+    isCheckbox: variation.id !== "all",
   }));
 
   const lineStyleMenuItems = LINE_STYLES.map((style) => ({
@@ -282,7 +315,7 @@ function Settings() {
             type="button"
             id="dropdown-variations"
             className={styles.settings__data_chart__drd_vars}
-            value={selectedVariation.name}
+            value={variationsDisplayValue}
             onClick={() => setShowVariationsMenu(!showVariationsMenu)}
             isOpen={showVariationsMenu}
           />
@@ -291,7 +324,7 @@ function Settings() {
               items={variationMenuItems}
               showDots={true}
               className={styles.dropdownMenuVariations}
-              selectedLabel={selectedVariation.name}
+              multiSelect={true}
             />
           )}
         </li>

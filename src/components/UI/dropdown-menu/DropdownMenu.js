@@ -1,6 +1,6 @@
 import styles from "./DropdownMenu.module.scss";
 
-function DropdownMenu({ items = [], showDots = true, className, selectedLabel }) {
+function DropdownMenu({ items = [], showDots = true, className, selectedLabel, multiSelect = false }) {
   // Prevent click events from bubbling up to document
   const handleContainerClick = (e) => {
     e.stopPropagation();
@@ -12,7 +12,7 @@ function DropdownMenu({ items = [], showDots = true, className, selectedLabel })
       onMouseDown={handleContainerClick}
     >
       {items.map((item, index) => {
-        const isSelected = selectedLabel && item.label === selectedLabel;
+        const isSelected = multiSelect ? item.isSelected : (selectedLabel && item.label === selectedLabel);
         return (
           <div
             key={index}
@@ -30,6 +30,16 @@ function DropdownMenu({ items = [], showDots = true, className, selectedLabel })
                 />
               )}
               <span className={styles.dropdownMenu__label}>{item.label}</span>
+              {multiSelect && item.isCheckbox && (
+                <div className={styles.dropdownMenu__checkboxWrapper}>
+                  <div className={[
+                    styles.dropdownMenu__checkbox,
+                    isSelected && styles.dropdownMenu__checkbox_checked
+                  ].filter(Boolean).join(" ")}>
+                    {isSelected && <div className={styles.dropdownMenu__checkbox__dot} />}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
