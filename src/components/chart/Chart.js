@@ -159,13 +159,20 @@ function Chart() {
 
     variations.forEach((variation) => {
       const colorIndex = variation.originalIndex;
-      const chartData = labels.map((date) => {
+      const chartData = labels.map((date, index) => {
         // For single date mode, only show data for the selected date
         if (isSingleDate && date !== selectedDateRange.start) {
           return null;
         }
 
-        const dayData = dataMap.get(date);
+        let dayData = dataMap.get(date);
+
+        // If no data for this date and it's the last label, use the previous date's data
+        // This ensures the line extends to the right edge where the next month label is
+        if (!dayData && index === labels.length - 1 && index > 0) {
+          const prevDate = labels[index - 1];
+          dayData = dataMap.get(prevDate);
+        }
 
         if (!dayData) return null;
 
@@ -232,7 +239,7 @@ function Chart() {
     Filler
   );
 
-  const chartOptions = {
+  const chartOptions = useMemo(() => ({
     maintainAspectRatio: false,
     interaction: {
       mode: "index",
@@ -247,9 +254,38 @@ function Chart() {
         mode: "index",
         intersect: false,
         filter: function(tooltipItem) {
-          return !tooltipItem.dataset.label.endsWith('_highlight');
+          // Hide tooltip for highlight datasets
+          if (tooltipItem.dataset.label.endsWith('_highlight')) {
+            return false;
+          }
+          // Hide tooltip for the last data point (next month label with no real data)
+          const lastIndex = tooltipItem.chart.data.labels.length - 1;
+          if (tooltipItem.dataIndex === lastIndex) {
+            const date = tooltipItem.chart.data.labels[lastIndex];
+            const hasRealData = dataMap.has(date);
+            if (!hasRealData) {
+              return false;
+            }
+          }
+          return true;
         },
         callbacks: {
+          beforeBody: function(tooltipItems) {
+            // Check if this is the last data point without real data
+            if (tooltipItems && tooltipItems.length > 0) {
+              const dataIndex = tooltipItems[0].dataIndex;
+              const chartLabels = tooltipItems[0].chart.data.labels;
+              const lastIndex = chartLabels.length - 1;
+
+              if (dataIndex === lastIndex) {
+                const lastLabel = chartLabels[lastIndex];
+                if (!dataMap.has(lastLabel)) {
+                  // Return empty to prevent tooltip display
+                  return [];
+                }
+              }
+            }
+          },
           labelColor: function (context) {
             return {
               borderColor: context.dataset.borderColor,
@@ -315,6 +351,23 @@ function Chart() {
 
           const tooltipModel = context.tooltip;
 
+          // Check if this is the last data point without real data
+          if (tooltipModel.dataPoints && tooltipModel.dataPoints.length > 0) {
+            const dataIndex = tooltipModel.dataPoints[0].dataIndex;
+            const chartLabels = context.chart.data.labels;
+            const lastIndex = chartLabels.length - 1;
+
+            // If hovering over the last point and it has no real data, hide tooltip
+            if (dataIndex === lastIndex) {
+              const lastLabel = chartLabels[lastIndex];
+              if (!dataMap.has(lastLabel)) {
+                tooltipEl.style.opacity = 0;
+                tooltipEl.style.pointerEvents = "none";
+                return;
+              }
+            }
+          }
+
           // Check if cursor is over date picker or dropdown menu
           const datePickerOpen = document.querySelector('[class*="dateRangePicker"]');
           const dropdownMenuOpen = document.querySelector('[class*="dropdownMenu"]');
@@ -327,6 +380,13 @@ function Chart() {
           }
 
           if (tooltipModel.opacity === 0 && !tooltipEl.isHovered) {
+            tooltipEl.style.opacity = 0;
+            tooltipEl.style.pointerEvents = "none";
+            return;
+          }
+
+          // Check if body is empty (all items filtered out)
+          if (!tooltipModel.body || tooltipModel.body.length === 0) {
             tooltipEl.style.opacity = 0;
             tooltipEl.style.pointerEvents = "none";
             return;
@@ -572,7 +632,7 @@ function Chart() {
         beginAtZero: true,
       },
     },
-  };
+  }), [theme, dataMap]);
 
   const chartData = {
     labels,
