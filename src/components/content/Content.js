@@ -1,11 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Settings from "../settings/Settings";
 import styles from "./Content.module.scss";
 import Chart from "../chart/Chart";
-import { data } from "../chart/data";
 import { lineStyles } from "../../utils/constants/chartConstants";
 
 function Content() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch("https://example.com/api/data")
+      .then((res) => res.json())
+      .then((data) => setData(data));
+  }, []);
+
   const variations = useMemo(() => {
     const allOption = {
       id: "all",
@@ -40,6 +47,8 @@ function Content() {
 
   const props = { settingsState, setSettingsState, initState };
 
+  if (!data) return;
+
   return (
     <main className={styles.content}>
       <Settings
@@ -47,7 +56,7 @@ function Content() {
         variations={variations}
         availableDates={availableDates}
       />
-      <Chart {...props} />
+      <Chart {...props} data={data} />
     </main>
   );
 }

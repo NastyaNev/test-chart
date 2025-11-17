@@ -14,14 +14,13 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useTheme } from "../../hooks/useTheme";
-import { data } from "./data";
 import { hexToRGBA } from "../../utils/functions/functions";
 import { colorPalette } from "../../utils/constants/chartConstants";
 import { createCrosshairPlugin } from "./config/crosshairPlugin";
 import { createCustomTooltipConfig } from "./config/customTooltip";
 import { createChartOptions } from "./config/chartOptions";
 
-function Chart(props) {
+function Chart({ data, ...props }) {
   const { settingsState } = props;
 
   const {
