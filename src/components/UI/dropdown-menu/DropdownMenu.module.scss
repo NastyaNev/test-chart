@@ -1,4 +1,4 @@
-@import "../../../utils/styles/vars";
+@use "../../../utils/styles/vars" as *;
 
 .dropdown-menu {
     background-color: var(--bg-color);

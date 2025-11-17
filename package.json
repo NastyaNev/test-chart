@@ -1,5 +1,6 @@
 {
   "name": "test-chart",
+  "type": "module",
   "homepage": "https://nastyanev.github.io/test-chart",
   "version": "0.1.0",
   "private": true,
