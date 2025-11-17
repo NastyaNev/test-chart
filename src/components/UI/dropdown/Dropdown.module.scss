@@ -9,13 +9,13 @@
     gap: 8px;
     cursor: pointer;
 
-    &:hover:not(.dropdown_disabled) {
-        .dropdown__icon:not(.dropdown__icon_open) svg {
+    &:hover:not(.dropdown--disabled) {
+        .dropdown__icon:not(.dropdown__icon--open) svg {
             transform: translateY(1px);
         }
     }
 
-    &_disabled {
+    &--disabled {
         opacity: 0.5;
         cursor: not-allowed;
         pointer-events: none;
@@ -54,7 +54,7 @@
             }
         }
 
-        &_open {
+        &--open {
             svg {
                 transform: rotate(180deg);
             }

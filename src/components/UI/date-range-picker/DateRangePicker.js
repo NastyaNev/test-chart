@@ -176,7 +176,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
   return (
     <div
       className={[styles.dateRangePicker, className].filter(Boolean).join(" ")}
-      onClick={handleContainerClick}
+      onMouseDown={handleContainerClick}
     >
       <div className={styles.dateRangePicker__header}>
         <button

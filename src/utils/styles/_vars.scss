@@ -1,3 +1,5 @@
+@import "./themes/index.scss";
+
 :root {
     //colors
     --lightBgColor: #ffffff;
@@ -12,7 +14,6 @@
     //hover states
     --hover-bg-color: rgba(65, 65, 99, 0.08);
     --hover-border-color: #9D9BB0;
-    --hover-icon-color: #1B1B23;
 
     --active-bg-color: rgba(65, 65, 99, 0.15);
     --active-border-color: #7A7890;
@@ -55,10 +56,6 @@
     &:hover:not(:disabled) {
         background-color: var(--hover-bg-color);
         border-color: var(--hover-border-color);
-
-        svg path {
-            fill: var(--hover-icon-color);
-        }
     }
 
     &:active:not(:disabled) {

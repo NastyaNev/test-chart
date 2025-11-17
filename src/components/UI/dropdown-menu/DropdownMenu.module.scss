@@ -1,6 +1,6 @@
 @import "../../../utils/styles/vars";
 
-.dropdownMenu {
+.dropdown-menu {
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -24,7 +24,7 @@
             background-color: var(--hover-bg-color);
         }
 
-        &_selected {
+        &--selected {
             background-color: rgba(65, 65, 99, 0.12);
             font-weight: 500;
 
@@ -58,7 +58,7 @@
         flex: 1;
     }
 
-    &__checkboxWrapper {
+    &__checkbox-wrapper {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -83,7 +83,7 @@
             border-color: var(--hover-border-color);
         }
 
-        &_checked {
+        &--checked {
             border-color: var(--border-color);
             background-color: var(--bg-color);
         }

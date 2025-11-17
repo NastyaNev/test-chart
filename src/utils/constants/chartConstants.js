@@ -1,6 +1,6 @@
-export const COLOR_PALETTE = ["#FF8346", "#3838E7", "#5E5D67", "#ff46beff"];
+export const colorPalette = ["#FF8346", "#3838E7", "#5E5D67", "#ff46beff"];
 
-export const LINE_STYLES = [
+export const lineStyles = [
   {
     id: 1,
     name: "Curve line",

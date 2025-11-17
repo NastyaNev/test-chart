@@ -3,12 +3,23 @@
     justify-content: space-between;
     gap: 20px;
 
-    &__data_chart {
+    &__data-chart {
         display: flex;
         gap: 8px;
 
-        &__drd_vars {
+        li {
+            position: relative;
+        }
+
+        &__drd-vars {
             width: 160px;
+        }
+
+        &__drd-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            z-index: 1000;
         }
     }
 
@@ -21,6 +32,8 @@
         }
 
         li {
+            position: relative;
+
             &:first-child {
                 margin-right: 10px;
             }
@@ -31,46 +44,42 @@
             margin-left: -10px;
 
             button {
+                position: relative;
+
                 &:first-child {
-                    border-right: none;
                     width: 26px;
                     border-radius: 4px 0 0 4px;
                 }
 
                 &:last-child {
+                    margin-left: -1px;
                     border-radius: 0 4px 4px 0;
+                }
+
+                &:hover:not(:disabled) {
+                    z-index: 1;
                 }
             }
         }
 
-        &__no_frame_btn {
-            // &:last-child {
-            //     button {
-            //         padding-left: 0;
-            //     }
-            // }
+        &__no-frame-btn {
 
             button {
                 border: none;
             }
+
+            &+& {
+                margin-left: -10px;
+            }
         }
     }
-}
-
-.dropdownMenuVariations,
-.dropdownMenuLineStyle,
-.dropdownMenuDate {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    z-index: 1000;
 }
 
 @media screen and (max-width: 671px) {
     .settings {
         flex-direction: column;
 
-        &__data_chart {
+        &__data-chart {
             flex-direction: column;
         }
 
