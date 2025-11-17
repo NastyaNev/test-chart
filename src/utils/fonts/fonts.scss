@@ -1,15 +1,15 @@
 @font-face {
     font-family: 'Roboto';
-    src: url('./roboto-regular.woff2') format('woff2'),
-        url('./roboto-regular.woff') format('woff');
+    src: url('/test-chart/fonts/roboto-regular.woff2') format('woff2'),
+        url('/test-chart/fonts/roboto-regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Roboto';
-    src: url('./roboto-bold.woff2') format('woff2'),
-        url('./roboto-bold.woff') format('woff');
+    src: url('/test-chart/fonts/roboto-bold.woff2') format('woff2'),
+        url('/test-chart/fonts/roboto-bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }

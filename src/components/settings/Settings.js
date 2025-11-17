@@ -20,6 +20,8 @@ function Settings({ variations, availableDates, ...props }) {
   };
 
   useEffect(() => {
+    if (variations.length === 0 || availableDates.length === 0) return;
+
     const params = new URLSearchParams(window.location.search);
     let needsUpdate = false;
 
@@ -69,7 +71,7 @@ function Settings({ variations, availableDates, ...props }) {
       url.search = params.toString();
       window.history.replaceState({}, "", url);
     }
-  }, []);
+  }, [variations, availableDates]);
 
   const dropdownRefs = useRef({});
 
