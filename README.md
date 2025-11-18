@@ -1,12 +1,12 @@
 <p align="center">
     <b align="center" ><a href="https://spb.hh.ru/resume/4ae51cd8ff0fa6792e0039ed1f706757556277" title="CV link on hh.ru">Nevedrova Anastasiia</a></b>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <b align="center" ><a href="https://development.kameleoon.net/akovalev/frontend-interview-task" title="Task repo link">Frontend Interview Task for Kameleoon</a></b>
-   </p>
- </p>
- <p align="center">
-  <h4 align="center" >Demo published on GitHub-pages - <a href="https://nastyanev.github.io/test-chart/" title="GitHub Pages project link">ссылка</a>.</h4>
+</p>
+<p align="center">
+  <h4 align="center" >Demo published on GitHub-pages - <a href="https://nastyanev.github.io/test-chart/" title="GitHub Pages project link">link</a>.</h4>
   <p align="center" >Please, don't forget to push "Open link in new tab" :wink: </p>
- </p>
+</p>
 
 ***TO START LOCALLY:***
 
@@ -24,6 +24,8 @@
    ```console
    npm run dev
    ```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   
 `TECH STACK:`
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -39,13 +41,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 `For chart:`
 <a href="https://www.chartjs.org/" title="Chart.js"><img src="https://img.shields.io/badge/Chart.js-FF6384?logo=chartdotjs&logoColor=white" alt="Chart.js" height="30px"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 `To mock data:`
 <a href="https://mswjs.io/" title="MSW"><img src="https://img.shields.io/badge/MSW-FF6A33?logo=msw&logoColor=white" alt="MSW" height="30px"></a>
 
-├── app # Страницы ([next js](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts)) <br />
-├── components # Компоненты высокого уровня, такие как фильтры, формы и тд. Состоят из компонентов папки ui <br />
-├── ui # Базовые компоненты ui, базовые стили компонентов <br />
-├── hooks # Собственные хуки проекта <br />
-├── styles # Глобальные стили и темы <br />
-├── utils # Вспомогательные функции и константы <br />
-└── README.md
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+`STRUCTURE:`
+
+├── components # Highest lavel components, built from UI folder components <br />
+<br />├── ui # Базовые компоненты ui, базовые стили компонентов <br />
+├── hooks # Custom hooks <br />
+├── mocks # Mocking data functions <br />
+└── utils # Constants, SCSS vars, fonts, util functions <br />
