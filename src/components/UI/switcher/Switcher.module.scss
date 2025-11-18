@@ -27,7 +27,7 @@
             right: 0;
             bottom: 0;
             background-color: var(--border-color2);
-            mask-image: url(../../../../public/images/themes/light-theme.svg);
+            mask-image: url(/test-chart/images/themes/light-theme.svg);
             mask-size: 16px;
             mask-repeat: no-repeat;
             mask-position: right 2px top 50%;
@@ -57,7 +57,7 @@
 
         &:checked+#{$this}__slider {
             &::after {
-                mask-image: url(../../../../public/images/themes/dark-theme.svg);
+                mask-image: url(/test-chart/images/themes/dark-theme.svg);
                 mask-position: left 2px top 50%;
             }
 

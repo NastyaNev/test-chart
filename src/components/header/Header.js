@@ -1,6 +1,6 @@
 import styles from "./Header.module.scss";
-import Switcher from "../UI/switcher/Switcher";
-import { useTheme } from "../../hooks/useTheme";
+import Switcher from "@/components/UI/switcher/Switcher";
+import { useTheme } from "@/hooks/useTheme";
 
 function Header() {
   const { theme, toggleTheme } = useTheme();

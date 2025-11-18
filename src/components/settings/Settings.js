@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
-import Button from "../UI/button/Button";
-import Dropdown from "../UI/dropdown/Dropdown";
-import DropdownMenu from "../UI/dropdown-menu/DropdownMenu";
-import DateRangePicker from "../UI/date-range-picker/DateRangePicker";
+import Button from "@/components/UI/button/Button";
+import Dropdown from "@/components/UI/dropdown/Dropdown";
+import DropdownMenu from "@/components/UI/dropdown-menu/DropdownMenu";
+import DateRangePicker from "@/components/UI/date-range-picker/DateRangePicker";
 import styles from "./Settings.module.scss";
-import * as svg from "../UI/Icons";
-import { lineStyles, colorPalette } from "../../utils/constants/chartConstants";
+import * as svg from "@/components/UI/Icons";
+import { lineStyles, colorPalette } from "@/utils/constants/chartConstants";
 
 function Settings({ variations, availableDates, ...props }) {
   const { settingsState, setSettingsState, initState } = props;

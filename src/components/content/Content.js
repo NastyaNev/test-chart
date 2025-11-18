@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import Settings from "../settings/Settings";
+import Settings from "@/components/settings/Settings";
 import styles from "./Content.module.scss";
-import Chart from "../chart/Chart";
-import { lineStyles } from "../../utils/constants/chartConstants";
+import Chart from "@/components/chart/Chart";
+import { lineStyles } from "@/utils/constants/chartConstants";
 
 function Content() {
   const [data, setData] = useState(null);

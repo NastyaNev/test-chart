@@ -1,4 +1,4 @@
-import { hexToRGBA } from "../../../utils/functions/functions";
+import { hexToRGBA } from "@/utils/functions/functions";
 
 export const createChartOptions = (theme, customTooltipConfig) => {
   return {

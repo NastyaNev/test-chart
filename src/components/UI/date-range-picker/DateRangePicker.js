@@ -6,7 +6,6 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
   const [endDate, setEndDate] = useState(selectedEndDate);
   const [hoveredDate, setHoveredDate] = useState(null);
 
-  // Parse available dates and get available months
   const availableMonthsInfo = useMemo(() => {
     if (!availableDates.length) return null;
 
@@ -16,7 +15,6 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     const firstDate = sortedDates[0];
     const lastDate = sortedDates[sortedDates.length - 1];
 
-    // Get all unique year-month combinations
     const monthsSet = new Set();
     sortedDates.forEach(date => {
       const yearMonth = `${date.getFullYear()}-${date.getMonth()}`;
@@ -39,7 +37,6 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     };
   }, [availableDates]);
 
-  // Current viewing month/year
   const [currentMonth, setCurrentMonth] = useState(() =>
     availableMonthsInfo?.availableMonths[0]?.month ?? new Date().getMonth()
   );
@@ -47,7 +44,6 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     availableMonthsInfo?.availableMonths[0]?.year ?? new Date().getFullYear()
   );
 
-  // Navigation functions
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
@@ -66,7 +62,6 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     }
   };
 
-  // Check if prev/next buttons should be disabled
   const canGoPrev = useMemo(() => {
     if (!availableMonthsInfo) return false;
     const firstAvailable = availableMonthsInfo.availableMonths[0];
@@ -83,24 +78,21 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     return false;
   }, [availableMonthsInfo, currentMonth, currentYear]);
 
-  // Generate calendar grid
   const calendarDays = useMemo(() => {
     if (!availableMonthsInfo) return [];
 
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
 
-    const startDay = firstDayOfMonth.getDay(); // 0 = Sunday
+    const startDay = firstDayOfMonth.getDay();
     const daysInMonth = lastDayOfMonth.getDate();
 
     const days = [];
 
-    // Add empty cells for days before month starts
     for (let i = 0; i < startDay; i++) {
       days.push(null);
     }
 
-    // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       days.push({
@@ -118,11 +110,9 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     if (!dayInfo || !dayInfo.isAvailable) return;
 
     if (!startDate || (startDate && endDate)) {
-      // Start new selection
       setStartDate(dayInfo.dateStr);
       setEndDate(null);
     } else {
-      // Complete selection
       const start = new Date(startDate);
       const end = new Date(dayInfo.dateStr);
 
@@ -168,29 +158,28 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // Prevent click events from bubbling up to document
   const handleContainerClick = (e) => {
     e.stopPropagation();
   };
 
   return (
     <div
-      className={[styles.dateRangePicker, className].filter(Boolean).join(" ")}
+      className={[styles["date-range-picker"], className].filter(Boolean).join(" ")}
       onMouseDown={handleContainerClick}
     >
-      <div className={styles.dateRangePicker__header}>
+      <div className={styles["date-range-picker__header"]}>
         <button
-          className={styles.dateRangePicker__navBtn}
+          className={styles["date-range-picker__nav-btn"]}
           disabled={!canGoPrev}
           onClick={handlePrevMonth}
         >
           &lt;
         </button>
-        <div className={styles.dateRangePicker__monthYear}>
+        <div className={styles["date-range-picker__monthYear"]}>
           {getMonthName(currentMonth)} {currentYear}
         </div>
         <button
-          className={styles.dateRangePicker__navBtn}
+          className={styles["date-range-picker__nav-btn"]}
           disabled={!canGoNext}
           onClick={handleNextMonth}
         >
@@ -198,25 +187,25 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
         </button>
       </div>
 
-      <div className={styles.dateRangePicker__weekDays}>
+      <div className={styles["date-range-picker__week-days"]}>
         {weekDays.map((day, index) => (
-          <div key={index} className={styles.dateRangePicker__weekDay}>
+          <div key={index} className={styles["date-range-picker__week-day"]}>
             {day}
           </div>
         ))}
       </div>
 
-      <div className={styles.dateRangePicker__days}>
+      <div className={styles["date-range-picker__days"]}>
         {calendarDays.map((dayInfo, index) => (
           <div
             key={index}
             className={[
-              styles.dateRangePicker__day,
-              !dayInfo && styles.dateRangePicker__day_empty,
-              dayInfo && !dayInfo.isAvailable && styles.dateRangePicker__day_disabled,
-              dayInfo && dayInfo.dateStr === startDate && styles.dateRangePicker__day_start,
-              dayInfo && dayInfo.dateStr === endDate && styles.dateRangePicker__day_end,
-              dayInfo && isDateInRange(dayInfo.dateStr) && styles.dateRangePicker__day_inRange
+              styles["date-range-picker__day"],
+              !dayInfo && styles["date-range-picker__day--empty"],
+              dayInfo && !dayInfo.isAvailable && styles["date-range-picker__day--disabled"],
+              dayInfo && dayInfo.dateStr === startDate && styles["date-range-picker__day--start"],
+              dayInfo && dayInfo.dateStr === endDate && styles["date-range-picker__day--end"],
+              dayInfo && isDateInRange(dayInfo.dateStr) && styles["date-range-picker__day--in-range"]
             ].filter(Boolean).join(" ")}
             onClick={() => handleDateClick(dayInfo)}
             onMouseEnter={() => dayInfo && setHoveredDate(dayInfo.dateStr)}

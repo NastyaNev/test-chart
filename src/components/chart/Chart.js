@@ -13,12 +13,12 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { useTheme } from "../../hooks/useTheme";
-import { hexToRGBA } from "../../utils/functions/functions";
-import { colorPalette } from "../../utils/constants/chartConstants";
-import { createCrosshairPlugin } from "./config/crosshairPlugin";
-import { createCustomTooltipConfig } from "./config/customTooltip";
-import { createChartOptions } from "./config/chartOptions";
+import { useTheme } from "@/hooks/useTheme";
+import { hexToRGBA } from "@/utils/functions/functions";
+import { colorPalette } from "@/utils/constants/chartConstants";
+import { createCrosshairPlugin } from "@/components/chart/config/crosshairPlugin";
+import { createCustomTooltipConfig } from "@/components/chart/config/customTooltip";
+import { createChartOptions } from "@/components/chart/config/chartOptions";
 
 function Chart({ data, ...props }) {
   const { settingsState } = props;

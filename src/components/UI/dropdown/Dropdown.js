@@ -1,5 +1,5 @@
 import styles from "./Dropdown.module.scss";
-import * as svg from "../Icons";
+import * as svg from "@/components/UI/Icons";
 
 function Dropdown({
   className,

@@ -1,5 +1,5 @@
-import Content from "../content/Content";
-import Header from "../header/Header";
+import Content from "@/components/content/Content";
+import Header from "@/components/header/Header";
 import styles from "./App.module.scss";
 
 function App() {

@@ -1,6 +1,6 @@
-@use "../../../utils/styles/vars" as *;
+@use "@/utils/styles/vars" as *;
 
-.dateRangePicker {
+.date-range-picker {
     background-color: var(--bg-color);
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -16,7 +16,7 @@
         gap: 8px;
     }
 
-    &__navBtn {
+    &__nav-btn {
         background: none;
         border: 1px solid transparent;
         border-radius: 4px;
@@ -37,7 +37,7 @@
         }
     }
 
-    &__monthYear {
+    &__month-year {
         font-size: 14px;
         font-family: "Roboto", sans-serif;
         font-weight: 500;
@@ -46,14 +46,14 @@
         text-align: center;
     }
 
-    &__weekDays {
+    &__week-days {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
         gap: 4px;
         margin-bottom: 8px;
     }
 
-    &__weekDay {
+    &__week-day {
         font-size: 11px;
         font-family: "Roboto", sans-serif;
         color: var(--text-color);
@@ -84,19 +84,19 @@
             background-color: var(--hover-bg-color);
         }
 
-        &_empty {
+        &--empty {
             cursor: default;
             pointer-events: none;
         }
 
-        &_disabled {
+        &--disabled {
             opacity: 0.3;
             cursor: not-allowed;
             pointer-events: none;
         }
 
-        &_start,
-        &_end {
+        &--start,
+        &--end {
             background-color: rgba(65, 65, 99, 0.85);
             color: white;
             font-weight: 600;
@@ -106,7 +106,7 @@
             }
         }
 
-        &_inRange:not(&_start):not(&_end) {
+        &--in-range:not(&_start):not(&_end) {
             background-color: rgba(65, 65, 99, 0.15);
             font-weight: 500;
 
