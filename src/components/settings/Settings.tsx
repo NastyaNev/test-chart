@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useRef } from "react";
 import Button from "@/components/UI/button/Button";
 import Dropdown from "@/components/UI/dropdown/Dropdown";
-import DropdownMenu from "@/components/UI/dropdown-menu/DropdownMenu";
+import DropdownMenu, { DropdownMenuItem } from "@/components/UI/dropdown-menu/DropdownMenu";
 import DateRangePicker from "@/components/UI/date-range-picker/DateRangePicker";
 import styles from "./Settings.module.scss";
 import * as svg from "@/components/UI/Icons";
-import { lineStyles, colorPalette } from "@/utils/constants/chartConstants";
+import { lineStyles, colorPalette, LineStyle } from "@/utils/constants/chartConstants";
+import { Variation, SettingsProps } from "@/types";
 
-function Settings({ variations, availableDates, ...props }) {
+interface SettingsComponentProps extends SettingsProps {
+  variations: Variation[];
+  availableDates: string[];
+}
+
+function Settings({ variations, availableDates, ...props }: SettingsComponentProps) {
   const { settingsState, setSettingsState, initState } = props;
 
   const { selectedVariations, selectedLineStyle, dateRange, zoomLevel } =
@@ -36,11 +42,11 @@ function Settings({ variations, availableDates, ...props }) {
           ...s,
           selectedVariations: [variations[0]],
         }));
-        params.set("filter[variation]", variations[0].id);
+        params.set("filter[variation]", String(variations[0].id));
         needsUpdate = true;
       }
     } else {
-      params.set("filter[variation]", variations[0].id);
+      params.set("filter[variation]", String(variations[0].id));
       needsUpdate = true;
     }
 
@@ -49,7 +55,7 @@ function Settings({ variations, availableDates, ...props }) {
       const style = lineStyles.find((s) => String(s.id) === styleId);
       if (style) setSettingsState((s) => ({ ...s, selectedLineStyle: style }));
     } else {
-      params.set("filter[style]", lineStyles[0].id);
+      params.set("filter[style]", String(lineStyles[0].id));
       needsUpdate = true;
     }
 
@@ -67,20 +73,20 @@ function Settings({ variations, availableDates, ...props }) {
     }
 
     if (needsUpdate) {
-      const url = new URL(window.location);
+      const url = new URL(window.location.href);
       url.search = params.toString();
-      window.history.replaceState({}, "", url);
+      window.history.replaceState({}, "", url.toString());
     }
   }, [variations, availableDates]);
 
-  const dropdownRefs = useRef({});
+  const dropdownRefs = useRef<{ [key: string]: HTMLLIElement | null }>({});
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (!settingsState.isDropdownOpen) return;
 
       const isOutside = Object.values(dropdownRefs.current).every(
-        (ref) => ref && !ref.contains(event.target)
+        (ref) => ref && !ref.contains(event.target as Node)
       );
 
       if (isOutside) {
@@ -95,14 +101,14 @@ function Settings({ variations, availableDates, ...props }) {
     };
   }, [settingsState.isDropdownOpen]);
 
-  const updateURLParam = (key, value) => {
-    const url = new URL(window.location);
-    url.searchParams.set(key, value);
-    window.history.pushState({}, "", url);
+  const updateURLParam = (key: string, value: string | number) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set(key, String(value));
+    window.history.pushState({}, "", url.toString());
   };
 
-  const handleVariationSelect = (variation) => {
-    let newSelectedVariations;
+  const handleVariationSelect = (variation: Variation) => {
+    let newSelectedVariations: Variation[];
 
     if (variation.id === "all") {
       newSelectedVariations = [variation];
@@ -135,7 +141,7 @@ function Settings({ variations, availableDates, ...props }) {
     updateURLParam("filter[variation]", variationIds);
   };
 
-  const handleLineStyleSelect = (style) => {
+  const handleLineStyleSelect = (style: LineStyle) => {
     setSettingsState((s) => ({
       ...s,
       selectedLineStyle: style,
@@ -144,7 +150,7 @@ function Settings({ variations, availableDates, ...props }) {
     updateURLParam("filter[style]", style.id);
   };
 
-  const handleDateRangeSelect = (start, end) => {
+  const handleDateRangeSelect = (start: string, end: string) => {
     setSettingsState((s) => ({
       ...s,
       dateRange: { start, end },
@@ -171,15 +177,15 @@ function Settings({ variations, availableDates, ...props }) {
   const handleRefresh = () => {
     setSettingsState(initState);
 
-    const url = new URL(window.location);
-    url.searchParams.set("filter[variation]", variations[0].id);
-    url.searchParams.set("filter[style]", lineStyles[0].id);
+    const url = new URL(window.location.href);
+    url.searchParams.set("filter[variation]", String(variations[0].id));
+    url.searchParams.set("filter[style]", String(lineStyles[0].id));
     url.searchParams.set("filter[dateStart]", availableDates[0]);
     url.searchParams.set(
       "filter[dateEnd]",
       availableDates[availableDates.length - 1]
     );
-    window.history.pushState({}, "", url);
+    window.history.pushState({}, "", url.toString());
   };
 
   const handleDownload = () => {
@@ -206,7 +212,7 @@ function Settings({ variations, availableDates, ...props }) {
     document.body.removeChild(link);
   };
 
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr: string | null): string => {
     if (!dateStr) return "";
     const [year, month, day] = dateStr.split("-");
     return `${day}/${month}/${year.slice(-2)}`;
@@ -233,15 +239,15 @@ function Settings({ variations, availableDates, ...props }) {
     return `${selectedVariations.length} variations selected`;
   }, [selectedVariations]);
 
-  const variationMenuItems = variations.map((variation, index) => ({
+  const variationMenuItems: DropdownMenuItem[] = variations.map((variation, index) => ({
     label: variation.name,
-    color: variation.id === "all" ? null : colorPalette[index - 1],
+    color: variation.id === "all" ? undefined : colorPalette[index - 1],
     onClick: () => handleVariationSelect(variation),
     isSelected: selectedVariations.some((v) => v.id === variation.id),
     isCheckbox: variation.id !== "all",
   }));
 
-  const lineStyleMenuItems = lineStyles.map((style) => ({
+  const lineStyleMenuItems: DropdownMenuItem[] = lineStyles.map((style) => ({
     label: style.name,
     onClick: () => handleLineStyleSelect(style),
   }));

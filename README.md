@@ -90,5 +90,6 @@ src/
 │   └── UI/             # Basic UI components
 ├── hooks/              # Custom hooks
 ├── mocks/              # Mocking data functions
+├── types/              # TypeScript types
 └── utils/              # Constants, SCSS vars, fonts, util functions
 ```

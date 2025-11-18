@@ -1,6 +1,10 @@
+import { ChartOptions, TooltipModel, ScriptableContext, Tick } from "chart.js";
 import { hexToRGBA } from "@/utils/functions/functions";
 
-export const createChartOptions = (theme, customTooltipConfig) => {
+export const createChartOptions = (
+  theme: string,
+  customTooltipConfig: any
+): ChartOptions<"line"> => {
   return {
     maintainAspectRatio: false,
     interaction: {
@@ -16,7 +20,7 @@ export const createChartOptions = (theme, customTooltipConfig) => {
               : hexToRGBA("#414163", 0.7),
           width: 1,
         },
-      },
+      } as any,
       legend: {
         display: false,
       },
@@ -27,14 +31,14 @@ export const createChartOptions = (theme, customTooltipConfig) => {
         position: "bottom",
         border: {
           display: true,
-          color: theme == "light" ? "#C7C5D0" : "#414163",
+          color: theme === "light" ? "#C7C5D0" : "#414163",
           width: 1,
         },
         grid: {
           display: false,
         },
         ticks: {
-          callback: function (value, index) {
+          callback: function (this: any, value: string | number, index: number): string {
             const currentDate = new Date(this.getLabelForValue(value));
             const currentMonth = currentDate.getMonth();
 
@@ -44,7 +48,7 @@ export const createChartOptions = (theme, customTooltipConfig) => {
               });
             }
 
-            const prevDate = new Date(this.getLabelForValue(value - 1));
+            const prevDate = new Date(this.getLabelForValue((value as number) - 1));
             const prevMonth = prevDate.getMonth();
 
             if (currentMonth !== prevMonth) {
@@ -55,7 +59,7 @@ export const createChartOptions = (theme, customTooltipConfig) => {
 
             return "";
           },
-          color: theme == "light" ? "#414163" : "#C7C5D0",
+          color: theme === "light" ? "#414163" : "#C7C5D0",
           autoSkip: false,
           maxRotation: 0,
           minRotation: 0,
@@ -66,7 +70,7 @@ export const createChartOptions = (theme, customTooltipConfig) => {
         position: "top",
         border: {
           display: true,
-          color: theme == "light" ? "#C7C5D0" : "#414163",
+          color: theme === "light" ? "#C7C5D0" : "#414163",
           width: 1,
         },
         grid: {
@@ -80,17 +84,17 @@ export const createChartOptions = (theme, customTooltipConfig) => {
         position: "left",
         border: {
           display: true,
-          color: theme == "light" ? "#C7C5D0" : "#414163",
+          color: theme === "light" ? "#C7C5D0" : "#414163",
           width: 1,
         },
         grid: {
           display: false,
         },
         ticks: {
-          color: theme == "light" ? "#414163" : "#C7C5D0",
+          color: theme === "light" ? "#414163" : "#C7C5D0",
           stepSize: 10,
           autoSkip: false,
-          callback: function (value, index, ticks) {
+          callback: function (value: string | number): string {
             return value + "%";
           },
           crossAlign: "far",
@@ -101,7 +105,7 @@ export const createChartOptions = (theme, customTooltipConfig) => {
         position: "right",
         border: {
           display: true,
-          color: theme == "light" ? "#C7C5D0" : "#414163",
+          color: theme === "light" ? "#C7C5D0" : "#414163",
           width: 1,
         },
         grid: {

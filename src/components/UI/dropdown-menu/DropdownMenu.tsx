@@ -1,4 +1,21 @@
+import { MouseEvent } from "react";
 import styles from "./DropdownMenu.module.scss";
+
+export interface DropdownMenuItem {
+  label: string;
+  onClick: () => void;
+  color?: string;
+  isSelected?: boolean;
+  isCheckbox?: boolean;
+}
+
+interface DropdownMenuProps {
+  items?: DropdownMenuItem[];
+  showDots?: boolean;
+  className?: string;
+  selectedLabel?: string;
+  multiSelect?: boolean;
+}
 
 function DropdownMenu({
   items = [],
@@ -6,8 +23,8 @@ function DropdownMenu({
   className,
   selectedLabel,
   multiSelect = false,
-}) {
-  const handleContainerClick = (e) => {
+}: DropdownMenuProps) {
+  const handleContainerClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
   };
 

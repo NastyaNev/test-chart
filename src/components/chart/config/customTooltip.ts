@@ -1,18 +1,24 @@
-export const createCustomTooltipConfig = (theme, dataMap) => {
+import { TooltipModel, TooltipItem, Chart } from "chart.js";
+
+interface CustomTooltipElement extends HTMLDivElement {
+  isHovered?: boolean;
+}
+
+export const createCustomTooltipConfig = (theme: string, dataMap: Map<string, any>) => {
   return {
     enabled: false,
-    mode: "index",
+    mode: "index" as const,
     intersect: false,
-    filter: function (tooltipItem) {
+    filter: function (tooltipItem: TooltipItem<"line">) {
       // Hide tooltip for highlight datasets
-      if (tooltipItem.dataset.label.endsWith("_highlight")) {
+      if (tooltipItem.dataset.label?.endsWith("_highlight")) {
         return false;
       }
       // Hide tooltip for the last data point (next month label with no real data)
-      const lastIndex = tooltipItem.chart.data.labels.length - 1;
+      const lastIndex = tooltipItem.chart.data.labels!.length - 1;
       if (tooltipItem.dataIndex === lastIndex) {
-        const date = tooltipItem.chart.data.labels[lastIndex];
-        const hasRealData = dataMap.has(date);
+        const date = tooltipItem.chart.data.labels![lastIndex];
+        const hasRealData = dataMap.has(date as string);
         if (!hasRealData) {
           return false;
         }
@@ -20,30 +26,30 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
       return true;
     },
     callbacks: {
-      beforeBody: function (tooltipItems) {
+      beforeBody: function (tooltipItems: TooltipItem<"line">[]) {
         // Check if this is the last data point without real data
         if (tooltipItems && tooltipItems.length > 0) {
           const dataIndex = tooltipItems[0].dataIndex;
-          const chartLabels = tooltipItems[0].chart.data.labels;
+          const chartLabels = tooltipItems[0].chart.data.labels!;
           const lastIndex = chartLabels.length - 1;
 
           if (dataIndex === lastIndex) {
             const lastLabel = chartLabels[lastIndex];
-            if (!dataMap.has(lastLabel)) {
+            if (!dataMap.has(lastLabel as string)) {
               // Return empty to prevent tooltip display
               return [];
             }
           }
         }
       },
-      labelColor: function (context) {
+      labelColor: function (context: TooltipItem<"line">) {
         return {
-          borderColor: context.dataset.borderColor,
-          backgroundColor: context.dataset.borderColor,
+          borderColor: context.dataset.borderColor as string,
+          backgroundColor: context.dataset.borderColor as string,
           borderWidth: 0,
         };
       },
-      label: function (context) {
+      label: function (context: TooltipItem<"line">) {
         let label = context.dataset.label || "";
         if (context.parsed.y !== null) {
           label += " " + context.parsed.y + "%";
@@ -51,11 +57,11 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
         return label;
       },
     },
-    external: function (context) {
-      let tooltipEl = document.getElementById("chartjs-tooltip");
+    external: function (context: { chart: Chart; tooltip: TooltipModel<"line"> }) {
+      let tooltipEl = document.getElementById("chartjs-tooltip") as CustomTooltipElement | null;
 
       if (!tooltipEl) {
-        tooltipEl = document.createElement("div");
+        tooltipEl = document.createElement("div") as CustomTooltipElement;
         tooltipEl.id = "chartjs-tooltip";
         tooltipEl.style.position = "absolute";
         tooltipEl.style.pointerEvents = "none";
@@ -63,12 +69,12 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
         tooltipEl.isHovered = false;
 
         tooltipEl.addEventListener("mouseenter", function () {
-          tooltipEl.isHovered = true;
+          (this as CustomTooltipElement).isHovered = true;
         });
 
         tooltipEl.addEventListener("mouseleave", function () {
-          tooltipEl.isHovered = false;
-          tooltipEl.style.opacity = 0;
+          (this as CustomTooltipElement).isHovered = false;
+          this.style.opacity = "0";
         });
 
         document.body.appendChild(tooltipEl);
@@ -104,14 +110,14 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
       // Check if this is the last data point without real data
       if (tooltipModel.dataPoints && tooltipModel.dataPoints.length > 0) {
         const dataIndex = tooltipModel.dataPoints[0].dataIndex;
-        const chartLabels = context.chart.data.labels;
+        const chartLabels = context.chart.data.labels!;
         const lastIndex = chartLabels.length - 1;
 
         // If hovering over the last point and it has no real data, hide tooltip
         if (dataIndex === lastIndex) {
           const lastLabel = chartLabels[lastIndex];
-          if (!dataMap.has(lastLabel)) {
-            tooltipEl.style.opacity = 0;
+          if (!dataMap.has(lastLabel as string)) {
+            tooltipEl.style.opacity = "0";
             tooltipEl.style.pointerEvents = "none";
             return;
           }
@@ -128,20 +134,20 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
 
       // Hide tooltip if date picker or dropdown menu is open
       if (datePickerOpen || dropdownMenuOpen) {
-        tooltipEl.style.opacity = 0;
+        tooltipEl.style.opacity = "0";
         tooltipEl.style.pointerEvents = "none";
         return;
       }
 
       if (tooltipModel.opacity === 0 && !tooltipEl.isHovered) {
-        tooltipEl.style.opacity = 0;
+        tooltipEl.style.opacity = "0";
         tooltipEl.style.pointerEvents = "none";
         return;
       }
 
       // Check if body is empty (all items filtered out)
       if (!tooltipModel.body || tooltipModel.body.length === 0) {
-        tooltipEl.style.opacity = 0;
+        tooltipEl.style.opacity = "0";
         tooltipEl.style.pointerEvents = "none";
         return;
       }
@@ -156,11 +162,11 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
         tooltipEl.classList.add("no-transform");
       }
 
-      function getBody(bodyItem) {
+      function getBody(bodyItem: { lines: string[] | string }): string[] | string {
         return bodyItem.lines;
       }
 
-      function formatDate(dateString) {
+      function formatDate(dateString: string): string {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -191,7 +197,13 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
         });
         innerHtml += "</div>";
 
-        const items = bodyLines.map(function (body, i) {
+        interface SortableItem {
+          body: string[] | string;
+          colors: { borderColor: string; backgroundColor: string };
+          numericValue: number;
+        }
+
+        const items: SortableItem[] = bodyLines.map(function (body, i) {
           const bodyText = String(body);
           const parts = bodyText.split(" ");
           const value = parts[parts.length - 1];
@@ -199,7 +211,7 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
 
           return {
             body: bodyText,
-            colors: tooltipModel.labelColors[i],
+            colors: tooltipModel.labelColors![i] as { borderColor: string; backgroundColor: string },
             numericValue: numericValue,
           };
         });
@@ -222,7 +234,7 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
             markerColor +
             '; border-radius: 5px;"></span>';
 
-          const parts = item.body.split(" ");
+          const parts = String(item.body).split(" ");
           const name = parts.slice(0, -1).join(" ");
           const value = parts[parts.length - 1];
 
@@ -253,7 +265,7 @@ export const createCustomTooltipConfig = (theme, dataMap) => {
 
       const position = context.chart.canvas.getBoundingClientRect();
 
-      tooltipEl.style.opacity = 1;
+      tooltipEl.style.opacity = "1";
       tooltipEl.style.backgroundColor =
         theme === "light" ? "#ffffff" : "#000027";
       tooltipEl.style.borderRadius = "12px";

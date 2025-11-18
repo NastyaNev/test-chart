@@ -1,6 +1,6 @@
-export function hexToRGBA(hex, transp = 1) {
+export function hexToRGBA(hex: string, transp: number = 1): string {
   hex = hex.replace(/^#/, "");
-  let r, g, b;
+  let r: number, g: number, b: number;
 
   if (hex.length === 3) {
     r = parseInt(hex[0] + hex[0], 16);
@@ -14,6 +14,8 @@ export function hexToRGBA(hex, transp = 1) {
     r = parseInt(hex.substring(0, 2), 16);
     g = parseInt(hex.substring(2, 4), 16);
     b = parseInt(hex.substring(4, 6), 16);
+  } else {
+    throw new Error("Invalid hex color format");
   }
 
   return `rgba(${r}, ${g}, ${b}, ${transp})`;

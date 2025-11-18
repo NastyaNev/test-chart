@@ -1,9 +1,18 @@
-export const createCrosshairPlugin = () => {
-  let lastX = null;
+import { Plugin, Chart } from "chart.js";
+
+interface CrosshairPluginOptions {
+  line: {
+    width: number;
+    color: string;
+  };
+}
+
+export const createCrosshairPlugin = (): Plugin<"line", CrosshairPluginOptions> => {
+  let lastX: number | null = null;
 
   return {
     id: "crosshair",
-    afterDatasetsDraw: (chart, args, options) => {
+    afterDatasetsDraw: (chart: Chart, args: any, options: CrosshairPluginOptions) => {
       // Update lastX if there's an active point
       if (chart.tooltip?._active?.length) {
         const activePoint = chart.tooltip._active[0];

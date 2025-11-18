@@ -3,12 +3,13 @@ import Settings from "@/components/settings/Settings";
 import styles from "./Content.module.scss";
 import Chart from "@/components/chart/Chart";
 import { lineStyles } from "@/utils/constants/chartConstants";
+import { APIData, Variation, SettingsState } from "@/types";
 
 function Content() {
-  const [data, setData] = useState(null);
-  const [settingsState, setSettingsState] = useState(null);
+  const [data, setData] = useState<APIData | null>(null);
+  const [settingsState, setSettingsState] = useState<SettingsState | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +32,7 @@ function Content() {
         setData(jsonData);
       } catch (err) {
         console.error("Failed to fetch data:", err);
-        setError(err.message || "Failed to load data. Please try again later.");
+        setError((err as Error).message || "Failed to load data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -40,10 +41,10 @@ function Content() {
     fetchData();
   }, []);
 
-  const variations = useMemo(() => {
+  const variations = useMemo<Variation[]>(() => {
     if (!data?.variations) return [];
 
-    const allOption = {
+    const allOption: Variation = {
       id: "all",
       name: "All variations selected",
     };
@@ -54,12 +55,12 @@ function Content() {
     return [allOption, ...vars];
   }, [data]);
 
-  const availableDates = useMemo(() => {
+  const availableDates = useMemo<string[]>(() => {
     if (!data?.data) return [];
     return data.data.map((item) => item.date);
   }, [data]);
 
-  const initState = useMemo(() => {
+  const initState = useMemo<SettingsState | null>(() => {
     if (variations.length === 0 || availableDates.length === 0) return null;
 
     return {
@@ -80,8 +81,6 @@ function Content() {
     }
   }, [initState, settingsState]);
 
-  const props = { settingsState, setSettingsState, initState };
-
   if (loading) {
     return (
       <main className={styles.content}>
@@ -101,7 +100,9 @@ function Content() {
     );
   }
 
-  if (!data || !settingsState) return null;
+  if (!data || !settingsState || !initState) return null;
+
+  const props = { settingsState, setSettingsState, initState };
 
   return (
     <main className={styles.content}>

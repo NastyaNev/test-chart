@@ -1,8 +1,11 @@
 import styles from "./Switcher.module.scss";
 
-function Switcher(props) {
-  const { isChecked, toggle } = props;
+interface SwitcherProps {
+  isChecked: boolean;
+  toggle: () => void;
+}
 
+function Switcher({ isChecked, toggle }: SwitcherProps) {
   return (
     <label className={styles.switcher}>
       <input type="checkbox" checked={isChecked} onChange={toggle} />

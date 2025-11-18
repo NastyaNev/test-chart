@@ -1,6 +1,16 @@
 import styles from "./Dropdown.module.scss";
 import * as svg from "@/components/UI/Icons";
 
+interface DropdownProps {
+  className?: string;
+  type?: string;
+  id?: string;
+  value: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  isOpen?: boolean;
+}
+
 function Dropdown({
   className,
   type,
@@ -9,7 +19,7 @@ function Dropdown({
   onClick,
   disabled = false,
   isOpen = false,
-}) {
+}: DropdownProps) {
   return (
     <div
       className={[

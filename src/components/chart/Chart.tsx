@@ -11,6 +11,7 @@ import {
   PointElement,
   LineElement,
   Filler,
+  ChartDataset,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useTheme } from "@/hooks/useTheme";
@@ -19,8 +20,26 @@ import { colorPalette } from "@/utils/constants/chartConstants";
 import { createCrosshairPlugin } from "@/components/chart/config/crosshairPlugin";
 import { createCustomTooltipConfig } from "@/components/chart/config/customTooltip";
 import { createChartOptions } from "@/components/chart/config/chartOptions";
+import { APIData, SettingsProps } from "@/types";
 
-function Chart({ data, ...props }) {
+interface ChartProps extends SettingsProps {
+  data: APIData;
+}
+
+interface VariationWithIndex {
+  id: number | string;
+  name: string;
+  originalIndex: number;
+}
+
+interface DayData {
+  [variationId: string]: {
+    visits: number;
+    conversions: number;
+  };
+}
+
+function Chart({ data, ...props }: ChartProps) {
   const { settingsState } = props;
 
   const {
@@ -30,14 +49,12 @@ function Chart({ data, ...props }) {
     zoomLevel,
   } = settingsState;
 
-  const selectedVariationIds = selectedVariations.map((v) => {
-    return v.id;
-  });
+  const selectedVariationIds = selectedVariations.map((v) => v.id);
 
   const { theme } = useTheme();
 
   const { labels, variations, dataMap } = useMemo(() => {
-    const formatDate = (date) => {
+    const formatDate = (date: Date): string => {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const day = String(date.getDate()).padStart(2, "0");
@@ -56,7 +73,7 @@ function Chart({ data, ...props }) {
       });
     }
 
-    let labelsList = [];
+    let labelsList: string[] = [];
 
     if (dateRange.start && dateRange.end && dateRange.start === dateRange.end) {
       const selectedDate = new Date(dateRange.start);
@@ -87,7 +104,7 @@ function Chart({ data, ...props }) {
       }
     }
 
-    let variationsList = data.variations.map((i, index) => ({
+    let variationsList: VariationWithIndex[] = data.variations.map((i, index) => ({
       id: i.id ?? 0,
       name: i.name,
       originalIndex: index,
@@ -99,9 +116,9 @@ function Chart({ data, ...props }) {
       );
     }
 
-    const map = new Map();
+    const map = new Map<string, DayData>();
     data.data.forEach((d) => {
-      const varData = {};
+      const varData: DayData = {};
       Object.entries(d.visits).forEach(([id, visits]) => {
         varData[id] = {
           visits: Number(visits),
@@ -112,10 +129,10 @@ function Chart({ data, ...props }) {
     });
 
     return { labels: labelsList, variations: variationsList, dataMap: map };
-  }, [selectedVariationIds, dateRange]);
+  }, [selectedVariationIds, dateRange, data]);
 
-  const datasets = useMemo(() => {
-    const result = [];
+  const datasets = useMemo<ChartDataset<"line">[]>(() => {
+    const result: ChartDataset<"line">[] = [];
 
     const isSingleDate =
       dateRange.start && dateRange.end && dateRange.start === dateRange.end;
@@ -136,7 +153,7 @@ function Chart({ data, ...props }) {
 
         if (!dayData) return null;
 
-        const varData = dayData[variation.id];
+        const varData = dayData[String(variation.id)];
 
         if (!varData?.visits || !varData?.conversions) return 0;
 

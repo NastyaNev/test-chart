@@ -1,21 +1,54 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, MouseEvent } from "react";
 import styles from "./DateRangePicker.module.scss";
 
-function DateRangePicker({ availableDates = [], onRangeSelect, className, selectedStartDate = null, selectedEndDate = null }) {
-  const [startDate, setStartDate] = useState(selectedStartDate);
-  const [endDate, setEndDate] = useState(selectedEndDate);
-  const [hoveredDate, setHoveredDate] = useState(null);
+interface DayInfo {
+  day: number;
+  dateStr: string;
+  date: Date;
+  isAvailable: boolean;
+}
 
-  const availableMonthsInfo = useMemo(() => {
+interface MonthInfo {
+  year: number;
+  month: number;
+}
+
+interface AvailableMonthsInfo {
+  firstDate: Date;
+  lastDate: Date;
+  availableMonths: MonthInfo[];
+  availableDatesSet: Set<string>;
+}
+
+interface DateRangePickerProps {
+  availableDates?: string[];
+  onRangeSelect?: (startDate: string, endDate: string) => void;
+  className?: string;
+  selectedStartDate?: string | null;
+  selectedEndDate?: string | null;
+}
+
+function DateRangePicker({
+  availableDates = [],
+  onRangeSelect,
+  className,
+  selectedStartDate = null,
+  selectedEndDate = null
+}: DateRangePickerProps) {
+  const [startDate, setStartDate] = useState<string | null>(selectedStartDate);
+  const [endDate, setEndDate] = useState<string | null>(selectedEndDate);
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+
+  const availableMonthsInfo = useMemo<AvailableMonthsInfo | null>(() => {
     if (!availableDates.length) return null;
 
     const dates = availableDates.map(d => new Date(d));
-    const sortedDates = dates.sort((a, b) => a - b);
+    const sortedDates = dates.sort((a, b) => a.getTime() - b.getTime());
 
     const firstDate = sortedDates[0];
     const lastDate = sortedDates[sortedDates.length - 1];
 
-    const monthsSet = new Set();
+    const monthsSet = new Set<string>();
     sortedDates.forEach(date => {
       const yearMonth = `${date.getFullYear()}-${date.getMonth()}`;
       monthsSet.add(yearMonth);
@@ -78,7 +111,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     return false;
   }, [availableMonthsInfo, currentMonth, currentYear]);
 
-  const calendarDays = useMemo(() => {
+  const calendarDays = useMemo<(DayInfo | null)[]>(() => {
     if (!availableMonthsInfo) return [];
 
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
@@ -87,7 +120,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     const startDay = firstDayOfMonth.getDay();
     const daysInMonth = lastDayOfMonth.getDate();
 
-    const days = [];
+    const days: (DayInfo | null)[] = [];
 
     for (let i = 0; i < startDay; i++) {
       days.push(null);
@@ -106,7 +139,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     return days;
   }, [availableMonthsInfo, currentMonth, currentYear]);
 
-  const handleDateClick = (dayInfo) => {
+  const handleDateClick = (dayInfo: DayInfo | null) => {
     if (!dayInfo || !dayInfo.isAvailable) return;
 
     if (!startDate || (startDate && endDate)) {
@@ -131,7 +164,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     }
   };
 
-  const isDateInRange = (dateStr) => {
+  const isDateInRange = (dateStr: string | undefined) => {
     if (!startDate || !dateStr) return false;
 
     const current = new Date(dateStr);
@@ -146,7 +179,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
     return current >= rangeStart && current <= rangeEnd;
   };
 
-  const getMonthName = (monthIndex) => {
+  const getMonthName = (monthIndex: number): string => {
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
@@ -158,7 +191,7 @@ function DateRangePicker({ availableDates = [], onRangeSelect, className, select
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const handleContainerClick = (e) => {
+  const handleContainerClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
   };
 
