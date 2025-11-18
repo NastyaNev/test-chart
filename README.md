@@ -31,7 +31,7 @@
 <a href="https://www.w3.org/TR/CSS/" title="CSS3"><img src="https://img.shields.io/badge/Sass-C69?logo=sass&logoColor=fff" alt="SCSS" height="30px"></a>
 <a href="https://www.typescriptlang.org/" title="TypeScript"><img src="https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white" alt="TypeScript" height="30px"></a>
 <a href="https://vitejs.dev/" title="Vite"><img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white" alt="Vite" height="30px"></a>
-<a href="https://en.bem.info/methodology/" title="BEM"><img src="https://img.shields.io/badge/BEM-methodology-47A8E8?logo=data:image/svg+xml;base64,PHN2ZyB4…&logoColor=white" alt="BEM" height="30px"></a>
+<img src="https://img.shields.io/badge/BEM-00B1E6?style=for-the-badge&logoColor=white" height="30px">
 <a href="https://github.com/css-modules/css-modules" title="CSS Modules"><img src="https://img.shields.io/badge/CSS_Modules-000?logo=css3&logoColor=white" alt="CSS Modules" height="30px"></a>
 
 `Libraries & Tools:`
